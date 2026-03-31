@@ -42,6 +42,5 @@ Thông tin về source code example:
 ## Thông tin liên hệ & mua license key
 	
 Võ Hùng Vĩ
-Phone/zalo: 0939825125
 
-Trang chủ: https://viscomsolution.com/tong-hop-giai-phap-doc-bien-so-xe-va-quan-ly-xe-ra-vao/
+Phone/zalo: 0939825125
