@@ -1,6 +1,6 @@
 # VietANPR - thư viện đọc biển số xe máy & xe hơi
 
-https://vietanpr.com/vietanpr-phan-mem-nhan-dien-bien-so-xe-may-xe-hoi/
+https://viscomsolution.com/vietanpr-phan-mem-nhan-dien-bien-so-xe/
 
 ![](results/2023-07-16-10-35-27.jpg)
 
@@ -20,8 +20,8 @@ https://vietanpr.com/vietanpr-phan-mem-nhan-dien-bien-so-xe-may-xe-hoi/
 ![](results/2023-07-17-05-18-03.jpg)
 
 ## Demo chức năng
-Để test độ chính xác của phần mềm quý khách có thể chạy chương trình build sẵn (.exe) tại đường dẫn:
-https://vietanpr.com/download/VietANPR.zip
+Để test độ chính xác của phần mềm quý khách có thể chạy chương trình build sẵn (.exe) tại link cuối bài:
+https://viscomsolution.com/vietanpr-phan-mem-nhan-dien-bien-so-xe/
 
 Quý khách cần cài đặt thư viện để chạy chương trình:
 - Microsoft .NET Framework 4.6.1: https://dotnet.microsoft.com/en-us/download/dotnet-framework/net461
