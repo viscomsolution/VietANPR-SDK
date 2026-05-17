@@ -69,7 +69,9 @@ namespace VietANPR_UI
 
             StopProgressbar();
 
-            this.Text += " " + (Program.reader.IsLicense ? " (Licensed)" : " (Vui lòng liên hệ: 0939.825.125)");
+            if(!Program.reader.IsLicenseActivated)
+                this.Text += " | Vui lòng liên hệ 0939.825.125";
+
             lbl_version.Text = Program.reader.Version;
 
             string childform = TGMTregistry.GetInstance().ReadString("childform");
