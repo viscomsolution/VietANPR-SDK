@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualBasic.FileIO;
+using NAudio;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -20,7 +21,7 @@ namespace VietANPR_UI
     public partial class FormFolder : Form
     {
         string m_folderOutput = "";
-        List<Plate> m_plates = new List<Plate>();
+        //List<Plate> m_plates = new List<Plate>();
 
         static FormFolder m_instance;
         bool m_multithread = false;
@@ -37,6 +38,20 @@ namespace VietANPR_UI
         bool m_loaded = false;
         ManualResetEvent readerAvailableEvent = new ManualResetEvent(true);
 
+        List<VehiclePlate[]> _listResults = new List<VehiclePlate[]>();
+
+        Pen pen_blue_thick = new Pen(Color.FromArgb(40, 134, 255), 2);
+        Brush blue_brush_soft = new SolidBrush(Color.FromArgb(100, Color.FromArgb(40, 134, 255)));
+
+        double m_scaleX = 0;
+        double m_scaleY = 0;
+        double m_aspect = 0;
+
+        Bitmap m_bmp = null;
+        int m_selectedPlateIndex = -1;
+
+        Pen pen_red = new Pen(Color.FromArgb(255, 2, 228));
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         public FormFolder()
@@ -44,6 +59,11 @@ namespace VietANPR_UI
             InitializeComponent();
 
             Control.CheckForIllegalCrossThreadCalls = false;
+
+            this.AutoScaleMode = AutoScaleMode.None;
+            this.TopLevel = false;
+            this.Dock = DockStyle.Fill;
+            this.FormBorderStyle = FormBorderStyle.None;
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -55,12 +75,12 @@ namespace VietANPR_UI
             txtValidDir.Text = TGMTregistry.GetInstance().ReadString("txtValidDir");
             txtInvalidDir.Text = TGMTregistry.GetInstance().ReadString("txtInvalidDir");
 
-            for (int i = 0; i < lstImage.Columns.Count; i++)
+            for (int i = 0; i < listView1.Columns.Count; i++)
             {
                 int width = TGMTregistry.GetInstance().ReadInt("column_" + i.ToString() + "_width", -1);
                 if (width > -1)
                 {
-                    lstImage.Columns[i].Width = width;
+                    listView1.Columns[i].Width = width;
                 }
             }
             m_loaded = true;
@@ -68,10 +88,26 @@ namespace VietANPR_UI
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+        public void OnFormSelected(bool selected)
+        {
+            if (selected)
+            {
+
+            }
+            else
+            {
+
+            }
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
         private void FormFolder_SizeChanged(object sender, EventArgs e)
         {
             int padding = 30;
-            lstImage.Width = this.Width / 2 + padding;
+            listView1.Width = this.Width / 2 + padding;
+
+            AdjustSize();
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -85,10 +121,45 @@ namespace VietANPR_UI
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+        private void listView1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (listView1.SelectedIndices.Count == 0)
+                return;
+
+            DisplayResultImage();
+
+            int selectedIndex = listView1.SelectedIndices[0];
+            if (selectedIndex >= 0 && selectedIndex < _listResults.Count)
+            {
+                listView2.Items.Clear();
+                VehiclePlate[] plates = _listResults[selectedIndex];
+                for (int i = 0; i < plates.Length; i++)
+                {
+                    VehiclePlate plate = plates[i];
+                    ListViewItem item = new ListViewItem((i + 1).ToString());
+                    item.SubItems.Add(plate.text);
+                    item.SubItems.Add(plate.alphanumeric);
+                    item.SubItems.Add(plate.scoreQuad.ToString("N2"));
+
+                    listView2.Items.Add(item);
+                }
+            }
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private void listView2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            m_selectedPlateIndex = listView2.SelectedIndices.Count > 0 ? listView2.SelectedIndices[0] : -1;
+            pictureBox1.Refresh();
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
         private void bgLoadFile_DoWork(object sender, DoWorkEventArgs e)
         {
             List<string> files = new List<string>();
-            lstImage.Items.Clear();
+            listView1.Items.Clear();
 
             string[] fileList = Directory.GetFiles(txtFolderInput.Text, "*.jpg");
             foreach (string filePath in fileList)
@@ -118,36 +189,23 @@ namespace VietANPR_UI
             List<string> files = (List<string>)e.Result;
             for (int i = 0; i < files.Count; i++)
             {
-                lstImage.Items.Add(files[i]);
+                listView1.Items.Add(files[i]);
             }
-            FormMain.GetInstance().PrintMessage("Loaded " + lstImage.Items.Count + " images");
+            FormMain.GetInstance().PrintMessage("Loaded " + listView1.Items.Count + " images");
 
+            circle1.Visible = false;
             btnDetect.Enabled = true;
-        }
-
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        private void lstImage_MouseClick(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Right)
-            {
-                if (lstImage.FocusedItem.Bounds.Contains(e.Location) == true)
-                {
-                    contextMenuStrip1.Show(Cursor.Position);
-                }
-            }
-            else if (e.Button == MouseButtons.Left)
-            {
-                DisplayResultImage();
-            }
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         private void lstImage_KeyDown(object sender, KeyEventArgs e)
         {
+            if(listView1.SelectedItems.Count == 0)
+                return;
+            
             string filePath = TGMTutil.CorrectPath(txtFolderInput.Text);
-            filePath += lstImage.SelectedItems[0].Text;
+            filePath += listView1.SelectedItems[0].Text;
             if (e.KeyCode == Keys.Enter)
             {
                 System.Diagnostics.Process.Start(filePath);
@@ -156,7 +214,26 @@ namespace VietANPR_UI
             {
                 if(File.Exists(filePath))
                 {
+                    int currentIndex = listView1.SelectedIndices[0];
+
                     FileSystem.DeleteFile(filePath, UIOption.AllDialogs, RecycleOption.SendToRecycleBin);
+                    listView1.Items.Remove(listView1.SelectedItems[0]);
+
+                    
+                    if (currentIndex < listView1.Items.Count)
+                    {
+                        listView1.Items[currentIndex].Selected = true;
+                        listView1.EnsureVisible(currentIndex);
+                    }                        
+                    else
+                    {
+                        int lastIndex = currentIndex - 1;
+                        if (lastIndex >= 0)
+                        {
+                            listView1.Items[lastIndex].Selected = true;
+                            listView1.EnsureVisible(lastIndex);
+                        }                            
+                    }
                 }
                 else
                 {
@@ -167,46 +244,84 @@ namespace VietANPR_UI
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        void DisplayResultImage()
+        private void picResult_Paint(object sender, PaintEventArgs e)
         {
-            if (lstImage.Items.Count == 0 || lstImage.SelectedItems.Count == 0)
-            {
+            if (listView1.SelectedItems.Count == 0)
                 return;
-            }
 
-            string fileName = lstImage.SelectedItems[0].Text;
+            int selectedIndex = listView1.SelectedIndices[0];
+            if (selectedIndex == -1)
+                return;
 
+            if (selectedIndex >= _listResults.Count)
+                return;
 
-            string inputPath = TGMTutil.CorrectPath(txtFolderInput.Text);
-            string failedDir = txtFailedDir.Text != "" ? TGMTutil.CorrectPath(txtFailedDir.Text) : "";
-            
+            VehiclePlate[] plates = _listResults[selectedIndex];
 
-            if (m_folderOutput != "" && File.Exists(m_folderOutput + fileName))
+            for (int i = 0; i < plates.Length; i++)
             {
-                picResult.ImageLocation = m_folderOutput + fileName;
-                FormMain.GetInstance().PrintMessage(m_folderOutput + fileName);
-            }
-            else if (File.Exists(inputPath + fileName))
-            {
-                picResult.ImageLocation = inputPath + fileName;
-                FormMain.GetInstance().PrintMessage(inputPath + fileName);
-            }
-            else if (txtFailedDir.Text != "" && File.Exists(failedDir + fileName))
-            {
-                picResult.ImageLocation = failedDir + fileName;
-                FormMain.GetInstance().PrintMessage(failedDir + fileName);
-            }
-            else
-            {
-                FormMain.GetInstance().PrintError("File " + inputPath + fileName + " does not exist");
+                VehiclePlate plate = plates[i];
+                List<Point> drawPoints = new List<Point>();
+                drawPoints.Add(new Point(plate.top_left.X, plate.top_left.Y));
+                drawPoints.Add(new Point(plate.top_right.X, plate.top_right.Y));
+                drawPoints.Add(new Point(plate.bottom_right.X, plate.bottom_right.Y));
+                drawPoints.Add(new Point(plate.bottom_left.X, plate.bottom_left.Y));
+
+                drawPoints = ConvertToDrawPoint(drawPoints);
+
+                if (i == m_selectedPlateIndex)
+                {
+                    e.Graphics.DrawPolygon(pen_red, drawPoints.ToArray());
+                }
+                else
+                {
+                    e.Graphics.DrawPolygon(pen_blue_thick, drawPoints.ToArray());
+                    e.Graphics.FillPolygon(blue_brush_soft, drawPoints.ToArray());
+                }
             }
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private void lstImage_SelectedIndexChanged(object sender, EventArgs e)
+        void DisplayResultImage()
         {
-            DisplayResultImage();
+            if (listView1.Items.Count == 0 || listView1.SelectedItems.Count == 0)            
+                return;
+            
+
+            string fileName = listView1.SelectedItems[0].Text;
+
+
+            string inputPath = TGMTutil.CorrectPath(txtFolderInput.Text);
+            string failedDir = txtFailedDir.Text != "" ? TGMTutil.CorrectPath(txtFailedDir.Text) : "";
+
+
+            if (m_folderOutput != "" && File.Exists(m_folderOutput + fileName))
+            {
+                m_bmp = TGMTimage.LoadBitmapWithoutLock(m_folderOutput + fileName);
+                FormMain.GetInstance().PrintMessage(m_folderOutput + fileName);
+            }
+            else if (File.Exists(inputPath + fileName))
+            {
+                m_bmp = TGMTimage.LoadBitmapWithoutLock(inputPath + fileName);
+                FormMain.GetInstance().PrintMessage(inputPath + fileName);
+            }
+            else if (txtFailedDir.Text != "" && File.Exists(failedDir + fileName))
+            {
+                m_bmp = TGMTimage.LoadBitmapWithoutLock(failedDir + fileName);
+                FormMain.GetInstance().PrintMessage(failedDir + fileName);
+            }
+            else
+            {
+                FormMain.GetInstance().PrintError("File " + inputPath + fileName + " does not exist");
+                return;
+            }
+
+            pictureBox1.Image = m_bmp;
+            m_scaleX = (double)m_bmp.Width / pictureBox1.Width;
+            m_scaleY = (double)m_bmp.Height / pictureBox1.Height;
+
+            AdjustSize();
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -222,7 +337,7 @@ namespace VietANPR_UI
 
             TGMTregistry.GetInstance().SaveValue("folderInput", txtFolderInput.Text);
             FormMain.GetInstance().PrintMessage("Loading files...");
-            lstImage.Items.Clear();
+            listView1.Items.Clear();
             bgLoadFile.RunWorkerAsync();
         }
 
@@ -230,8 +345,11 @@ namespace VietANPR_UI
 
         private void contextMenuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
+            if (listView1.SelectedItems.Count == 0)
+                return;
+
             string filePath = TGMTutil.CorrectPath(txtFolderInput.Text);
-            filePath += lstImage.SelectedItems[0].Text;
+            filePath += listView1.SelectedItems[0].Text;
             if (!File.Exists(filePath))
             {
                 FormMain.GetInstance().PrintMessage("File does not exist");
@@ -287,21 +405,19 @@ namespace VietANPR_UI
             m_content = "";
             
 
-            for (int i = 0; i < lstImage.Items.Count; i++)
+            for (int i = 0; i < listView1.Items.Count; i++)
             {
-                if (bgWorker1.CancellationPending)
+                if (worker1.CancellationPending)
                     return;
-                //bgWorker1.ReportProgress(i + 1);
 
-                //Program.reader.OutputFileName = lstImage.Items[i].Text;
 
-                string filePath = lstImage.Items[i].Text;
-                string ext = filePath.Substring(filePath.Length - 4).ToLower();
+                string filePath = listView1.Items[i].Text;
+                string ext = Path.GetExtension(filePath).ToLower();
                 
 
                 if (ext != ".jpg" && ext != ".png" && ext != ".bmp")
                     continue;
-                FormMain.GetInstance().PrintMessage((i + 1).ToString() + " / " + lstImage.Items.Count + " " + filePath);
+                FormMain.GetInstance().PrintMessage((i + 1).ToString() + " / " + listView1.Items.Count + " " + filePath);
 
 
                 int availableReader = AvailableReader();
@@ -319,7 +435,7 @@ namespace VietANPR_UI
 
         private void bgWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            FormMain.GetInstance().PrintMessage(e.ProgressPercentage + "/" + lstImage.Items.Count + "(" + (100 * e.ProgressPercentage / lstImage.Items.Count) + " %)");
+            FormMain.GetInstance().PrintMessage(e.ProgressPercentage + "/" + listView1.Items.Count + "(" + (100 * e.ProgressPercentage / listView1.Items.Count) + " %)");
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -332,17 +448,11 @@ namespace VietANPR_UI
             string fileCsv = TGMTutil.CorrectPath(txtFolderInput.Text) + "_report.csv";
             File.WriteAllText(fileCsv, m_content);
 
-            btnDetect.Text = "Detect (F5)";
+            btnDetect.Text = "Start";
             if (m_folderOutput != "")
                 FormMain.GetInstance().PrintMessage("Save report to " + fileCsv);
-        }
 
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        void ReadAsync(int availableReader, int itemIndex, string inputDir, string filePath, string validDir, string invalidDir, string failedDir)
-        {
-            Thread t = new Thread(() => Read(availableReader, itemIndex, inputDir, filePath, validDir, invalidDir, failedDir));
-            t.Start();
+            circle1.Visible = false;
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -351,158 +461,91 @@ namespace VietANPR_UI
         {
             string filePathAbs = inputDir + fileName;
 
-            VehiclePlate plate;
-
             string text = "";
             string alphanumeric = "";
             bool isValid = true;
             string error = "";
 
             m_content += fileName + ",";
+            VehiclePlate[] plates = m_readers[availableReader].Reads(filePathAbs);
+            _listResults.Add(plates);
 
-            if (Program.readingMode == ReadingMode.Best)
-            {
-                VehiclePlate[] plates = m_readers[availableReader].Reads(filePathAbs);
-                if(plates.Length > 0)
+            if (plates.Length > 0)
+            {                
+                //int thickness = (int)Math.Round((float)bmp.Width / 200);
+                for (int j = 0; j < plates.Length; j++)
                 {
-                    plate = plates[0];
-                    m_plates.Add(new Plate(filePathAbs, plate.text, plate.alphanumeric));
 
-                    isValid &= plate.isValid;
-                    alphanumeric = plate.alphanumeric;
-                    text = plate.text;
-                    error = plate.error;
-
-                    m_content += text;
-                }    
-                else
-                {
-                    error = "Not found";
+                    VehiclePlate p = plates[j];
+                    //bmp = TGMTdraw.DrawRectangle(bmp, p.rect, Color.Green, false, thickness);
+                    isValid &= p.isValid;
+                    error = p.error;
+                    alphanumeric += p.alphanumeric + Program.delimiter;
+                    text += p.text + Program.delimiter;
+                    
                 }
+                m_content += text + "," + alphanumeric;                
             }
             else
             {
-                VehiclePlate[] plates = Program.reader.Reads(filePathAbs);
-
-                if (plates.Length > 0)
-                {
-                    Bitmap bmp = new Bitmap(filePathAbs);
-                    int thickness = (int)Math.Round((float)bmp.Width / 200);
-
-                    if (Program.readingMode == ReadingMode.All)
-                    {
-                        if (plates.Length == 1)
-                        {
-                            VehiclePlate p = plates[0];
-                            bmp = TGMTdraw.DrawRectangle(bmp, p.rect, Color.Green, false, thickness);
-                            isValid &= p.isValid;
-                            error = p.error;
-                            text = p.text;
-                            alphanumeric = p.alphanumeric;
-
-                            m_content += text;
-                        }
-                        else if(plates.Length > 1)
-                        {
-                            
-                            for (int j = 0; j < plates.Length; j++)
-                            {
-                                
-                                VehiclePlate p = plates[j];
-                                bmp = TGMTdraw.DrawRectangle(bmp, p.rect, Color.Green, false, thickness);
-                                isValid &= p.isValid;
-                                error = p.error;
-                                alphanumeric += p.alphanumeric + Program.delimiter;
-                                m_content += p.text + Program.delimiter + ",";
-                            }
-
-                            m_content = m_content.Substring(0, m_content.Length - 1);
-                        }
-                    }
-                    else if (Program.readingMode == ReadingMode.Biggest)
-                    {
-                        plate = ParkingUtil.GetBiggest(plates);
-                        bmp = TGMTdraw.DrawRectangle(bmp, plate.rect, Color.Green, false, thickness);
-                        isValid &= plate.isValid;
-                        text = plate.text;
-                        alphanumeric = plate.alphanumeric;
-
-                        m_content += text;
-                    }
-                    else if (Program.readingMode == ReadingMode.Center)
-                    {
-                        plate = ParkingUtil.GetNearestCenter(bmp, plates);
-                        bmp = TGMTdraw.DrawRectangle(bmp, plate.rect, Color.Green, false, thickness);
-                        isValid &= plate.isValid;
-                        text = plate.text;
-                        alphanumeric = plate.alphanumeric;
-
-                        m_content += text;
-                    }
-
-                    picResult.Image = bmp;
-
-                    m_plates.Add(new Plate(filePathAbs, text, alphanumeric));
-                }
-                else
-                {
-                    error = "Not found";
-                }
-            }            
+                error = "Not found";
+            }
+           
+   
 
             int i = itemIndex;
             if (text != "")
             {
-                if (lstImage.Items[i].SubItems.Count == 1)
+                if (listView1.Items[i].SubItems.Count == 1)
                 {
-                    lstImage.Items[i].SubItems.Add(text);
-                    lstImage.Items[i].SubItems.Add(alphanumeric);
+                    listView1.Items[i].SubItems.Add(text);
+                    listView1.Items[i].SubItems.Add(alphanumeric);
                 }
                 else
                 {
-                    lstImage.Items[i].SubItems[1].Text = text;
-                    lstImage.Items[i].SubItems[2].Text = alphanumeric;
+                    listView1.Items[i].SubItems[1].Text = text;
+                    listView1.Items[i].SubItems[2].Text = alphanumeric;
                 }
-                lstImage.Items[i].ForeColor = isValid ? Color.Blue : Color.Black;
+                listView1.Items[i].ForeColor = isValid ? Color.Blue : Color.Black;
 
                 if (isValid)
                 {
                     m_exactlyCount++;
                     if (chkMoveValid.Checked)
                     {
-                        Task.Run(() => File.Move(inputDir + lstImage.Items[i].Text, validDir + lstImage.Items[i].Text));
+                        Task.Run(() => File.Move(inputDir + listView1.Items[i].Text, validDir + listView1.Items[i].Text));
                     }
                 }
                 else
                 {
                     if (chkMoveInvalid.Checked)
                     {
-                        Task.Run(() => File.Move(inputDir + lstImage.Items[i].Text, invalidDir + lstImage.Items[i].Text));
+                        Task.Run(() => File.Move(inputDir + listView1.Items[i].Text, invalidDir + listView1.Items[i].Text));
                     }
                 }
             }
             else
             {
-                if (lstImage.Items[i].SubItems.Count == 1)
+                if (listView1.Items[i].SubItems.Count == 1)
                 {
-                    lstImage.Items[i].SubItems.Add(error);
+                    listView1.Items[i].SubItems.Add(error);
                 }
                 else
                 {
-                    lstImage.Items[i].SubItems[1].Text = error;
+                    listView1.Items[i].SubItems[1].Text = error;
                 }
                 if (chkMoveFail.Checked)
                 {
-                    Task.Run(() => File.Move(inputDir + lstImage.Items[i].Text, failedDir + lstImage.Items[i].Text));
+                    Task.Run(() => File.Move(inputDir + listView1.Items[i].Text, failedDir + listView1.Items[i].Text));
                 }
 
-                lstImage.Items[i].ForeColor = Color.Red;
+                listView1.Items[i].ForeColor = Color.Red;
 
             }
 
             m_content += "\r\n";
 
-            lstImage.EnsureVisible(i);
+            listView1.EnsureVisible(i);
 
             lock (m_lock)
             {
@@ -610,17 +653,19 @@ namespace VietANPR_UI
 
         private void btnDetect_Click(object sender, EventArgs e)
         {
-            if (btnDetect.Text.Contains("Detect"))
+            if (btnDetect.Text.Contains("Start"))
             {
-                m_plates.Clear();
+                circle1.Visible = true;
+                _listResults.Clear();
                 btn_export.Enabled = false;
-                bgWorker1.RunWorkerAsync();
+                worker1.RunWorkerAsync();
                 btnDetect.Text = "Stop";
             }
             else
             {
-                bgWorker1.CancelAsync();
-                btnDetect.Text = "Detect";                
+                circle1.Visible = false;
+                worker1.CancelAsync();
+                btnDetect.Text = "Start";                
             }
         }
 
@@ -643,24 +688,33 @@ namespace VietANPR_UI
                 excel.AddRow(0, 1, headers);
 
 
-                for (int i = 0; i < m_plates.Count; i++)
+                for (int i = 0; i < _listResults.Count; i++)
                 {
-                    Plate a = m_plates[i];
-                    a.index = i + 1;
-                    excel.AddRow(0, i + 2, a.ToArray(rd_fullPath.Checked));
-                }            
+                    VehiclePlate[] plates = _listResults[i];
+                    string text = "";
+                    string alphanumeric = "";
+
+                    for (int j=0;j<plates.Length;j++)
+                    {
+                        text += plates[j].text + Program.delimiter;
+                        alphanumeric += plates[j].alphanumeric + Program.delimiter;
+                    }
+
+                    string[] values = new string[] { (i + 1).ToString(), listView1.Items[i].Text, text, alphanumeric };
+                    excel.AddRow(0, i + 2, values);
+                }
 
 
 
                 for (int i = 1; i <= headers.Length; i++)
                 {
                     excel.SetAutoFitContent(0, i);
-                    excel.SetFormat(0, 1, i, Color.White, Color.Black, true);
+                    excel.SetStyle(0, 1, i, Color.White, Color.Black, true);
                 }
 
-                excel.DrawTable(0, 1, 1, m_plates.Count + 1, headers.Length);
+                excel.DrawTable(0, 1, 1, _listResults.Count + 1, headers.Length);
 
-            
+
                 excel.Save();
                 if (MessageBox.Show("Bạn có muốn mở file excel?", "Save thành công", MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {
@@ -708,10 +762,55 @@ namespace VietANPR_UI
             if (!m_loaded)
                 return;
 
-            for (int i = 0; i < lstImage.Columns.Count; i++)
+            for (int i = 0; i < listView1.Columns.Count; i++)
             {
-                TGMTregistry.GetInstance().SaveValue("column_" + i.ToString() + "_width", lstImage.Columns[i].Width);
+                TGMTregistry.GetInstance().SaveValue("column_" + i.ToString() + "_width", listView1.Columns[i].Width);
             }
         }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        List<Point> ConvertToDrawPoint(List<Point> pointFs)
+        {
+            List<Point> points = new List<Point>();
+            for (int i = 0; i < pointFs.Count; i++)
+            {
+                Point pointF = pointFs[i];
+                Point point = new Point();
+                point.X = (int)(pointF.X / m_scaleX);
+                point.Y = (int)(pointF.Y / m_scaleY);
+
+                points.Add(point);
+            }
+
+            return points;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        void AdjustSize()
+        {
+            if (m_bmp == null)
+                return;
+
+            m_aspect = (double)m_bmp.Width / (double)m_bmp.Height;
+            double panelAspect = (double)panelPicture.Width / (double)panelPicture.Height;
+            if (m_aspect > panelAspect)
+            {
+                pictureBox1.Width = panelPicture.Width;
+                pictureBox1.Height = (int)(pictureBox1.Width / m_aspect);
+            }
+            else if (m_aspect < panelAspect)
+            {
+                pictureBox1.Height = panelPicture.Height;
+                pictureBox1.Width = (int)(pictureBox1.Height * m_aspect);
+            }
+            m_scaleX = (double)m_bmp.Width / pictureBox1.Width;
+            m_scaleY = (double)m_bmp.Height / pictureBox1.Height;
+
+            pictureBox1.Refresh();
+        }
+
+
     }
 }

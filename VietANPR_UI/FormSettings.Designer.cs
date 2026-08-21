@@ -35,7 +35,7 @@
             this.rd_topLeft = new System.Windows.Forms.RadioButton();
             this.rd_all = new System.Windows.Forms.RadioButton();
             this.timerClear = new System.Windows.Forms.Timer(this.components);
-            this.btn_save = new AltoControls.AltoButton();
+            this.btn_save = new TGMTcontrols.DefaultButton();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -118,7 +118,6 @@
             this.btn_save.Name = "btn_save";
             this.btn_save.Radius = 10;
             this.btn_save.Size = new System.Drawing.Size(110, 40);
-            this.btn_save.Stroke = false;
             this.btn_save.StrokeColor = System.Drawing.Color.Gray;
             this.btn_save.TabIndex = 27;
             this.btn_save.Text = "Save";
@@ -149,6 +148,6 @@
         private System.Windows.Forms.RadioButton rd_biggest;
         private System.Windows.Forms.RadioButton rd_topLeft;
         private System.Windows.Forms.RadioButton rd_all;
-        private AltoControls.AltoButton btn_save;
+        private TGMTcontrols.DefaultButton btn_save;
     }
 }

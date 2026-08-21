@@ -19,6 +19,11 @@ using System.Drawing;
 using OfficeOpenXml.Style;
 using System.Windows.Forms;
 using OfficeOpenXml.Table;
+using System.Data;
+
+#if READ_EXCEL
+using ExcelDataReader;
+#endif
 
 namespace TGMTcs
 {
@@ -27,7 +32,7 @@ namespace TGMTcs
         ExcelPackage m_excel;
         ExcelWorkbook m_workbook;
 
-        
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         public TGMTexcel(string fileName)
         {
@@ -67,12 +72,78 @@ namespace TGMTcs
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public void SetFormat(int worksheetID, int row, int col, Color bgcolor, Color foreColor, bool bold = false)
+        public void SetStyle(int worksheetID, int row, int col, Color bgcolor, Color foreColor, bool bold = false)
         {
             m_workbook.Worksheets[worksheetID].Cells[row, col].Style.Fill.PatternType = ExcelFillStyle.Solid;
             m_workbook.Worksheets[worksheetID].Cells[row, col].Style.Fill.BackgroundColor.SetColor(bgcolor);
             m_workbook.Worksheets[worksheetID].Cells[row, col].Style.Font.Color.SetColor(foreColor);
             m_workbook.Worksheets[worksheetID].Cells[row, col].Style.Font.Bold = bold;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        // Set alignment for entire row
+        public void SetAlignmentRow(int worksheetID, int rowIdx, ExcelHorizontalAlignment hAlign = ExcelHorizontalAlignment.Center, ExcelVerticalAlignment vAlign = ExcelVerticalAlignment.Center)
+        {
+            var worksheet = m_workbook.Worksheets[worksheetID];
+
+            if(worksheet.Dimension == null)
+                return;
+
+            var startCol = worksheet.Dimension.Start.Column;
+            var endCol = worksheet.Dimension.End.Column;
+
+            for(int col = startCol; col <= endCol; col++)
+            {
+                worksheet.Cells[rowIdx, col].Style.HorizontalAlignment = hAlign;
+                worksheet.Cells[rowIdx, col].Style.VerticalAlignment = vAlign;
+            }
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        // Set alignment for entire column
+        public void SetAlignmentColumn(int worksheetID, int colIdx, ExcelHorizontalAlignment hAlign = ExcelHorizontalAlignment.Center, ExcelVerticalAlignment vAlign = ExcelVerticalAlignment.Center)
+        {
+            var worksheet = m_workbook.Worksheets[worksheetID];
+
+            if(worksheet.Dimension == null)
+                return;
+
+            var startRow = worksheet.Dimension.Start.Row;
+            var endRow = worksheet.Dimension.End.Row;
+
+            for(int row = startRow; row <= endRow; row++)
+            {
+                worksheet.Cells[row, colIdx].Style.HorizontalAlignment = hAlign;
+                worksheet.Cells[row, colIdx].Style.VerticalAlignment = vAlign;
+            }
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        // Set alignment for a range of cells
+        public void SetAlignmentRange(int worksheetID, int fromRow, int fromCol, int toRow, int toCol,
+            ExcelHorizontalAlignment hAlign = ExcelHorizontalAlignment.Center,
+            ExcelVerticalAlignment vAlign = ExcelVerticalAlignment.Center)
+        {
+            var worksheet = m_workbook.Worksheets[worksheetID];
+
+            for(int row = fromRow; row <= toRow; row++)
+            {
+                for(int col = fromCol; col <= toCol; col++)
+                {
+                    worksheet.Cells[row, col].Style.HorizontalAlignment = hAlign;
+                    worksheet.Cells[row, col].Style.VerticalAlignment = vAlign;
+                }
+            }
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public void SetFormatNumber(int worksheetID, int col, string format)
+        {
+            m_workbook.Worksheets[worksheetID].Columns[col].Style.Numberformat.Format = format;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -101,7 +172,7 @@ namespace TGMTcs
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public void AddRow(int worksheetID, int row, string[] values)
+        public void AddRow(int worksheetID, int row, object[] values)
         {
             for(int i=0; i<values.Length;i++)
             {
@@ -142,11 +213,173 @@ namespace TGMTcs
 
             ExcelWorksheet ws = m_workbook.Worksheets[worksheetID];
             //create a range for the table
-            ExcelRange range = ws.Cells[1, 1, toRow, toCol];
+            ExcelRange range = ws.Cells[fromRow, fromCol, toRow, toCol];
             //add a table to the range
-            //ExcelTable tab = ws.Tables.Add(range, "Table1");
+            ExcelTable table = ws.Tables.Add(range, "Table1");
+            table.ShowHeader = true;
+            table.TableStyle = TableStyles.Medium2;
+
+            // AutoFit columns to look better
+            ws.Cells[ws.Dimension.Address].AutoFitColumns();
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static ExcelWorksheet GetWorksheet(string filePath, int sheetIndex)
+        {
+            FileInfo existingFile = new FileInfo(filePath);
+            if (!existingFile.Exists)
+                return null;
+
+            try
+            {
+                ExcelPackage package = new ExcelPackage(existingFile);
+                ExcelWorksheet worksheet = package.Workbook.Worksheets[sheetIndex];
+                return worksheet;
+            }
+            catch (Exception ex)
+            {
+            }
+
+            return null;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#if READ_EXCEL
+        public static DataTable ReadExcel(string filepath)
+        {
+            if (!File.Exists(filepath))
+                return null;
+
+            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+
+            var stream = File.Open(filepath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            var reader = ExcelReaderFactory.CreateReader(stream);
+
+            var conf = new ExcelDataSetConfiguration
+            {
+                ConfigureDataTable = (_) => new ExcelDataTableConfiguration { UseHeaderRow = false }
+            };
+
+            DataSet result = reader.AsDataSet(conf);
+            if (result.Tables.Count == 0)
+                return null;
+
+
+            // Try to get the specified sheet
+            DataTable table = result.Tables[0];
+            return table;
+        }
+#endif
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static int Col(string chr)
+        {
+            if (chr.Length == 1)
+            {
+                return char.ToUpper(chr[0]) - 'A' + 1;
+            }
+            else if (chr.Length == 2)
+            {
+                return (char.ToUpper(chr[0]) - 'A' + 1) * 26 + (char.ToUpper(chr[1]) - 'A') + 1;
+            }
+            else
+            {
+                throw new ArgumentException("Invalid column name.");
+            }
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public void SetRowHeight(int worksheetID, int row, double height)
+        {
+            m_workbook.Worksheets[worksheetID].Row(row).Height = height;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public void SetColumnWidth(int worksheetID, int col, double width)
+        {
+            m_workbook.Worksheets[worksheetID].Column(col).Width = width;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public void AddImageToCell(int worksheetID, int row, int col, string imagePath, int maxWidthPixels = 100, int maxHeightPixels = 75)
+        {
+            if(!File.Exists(imagePath))
+                return;
+
+            try
+            {
+                var worksheet = m_workbook.Worksheets[worksheetID];
+
+                // Load image to get original dimensions
+                using(var image = Image.FromFile(imagePath))
+                {
+                    int originalWidth = image.Width;
+                    int originalHeight = image.Height;
+
+                    // Calculate aspect ratio
+                    float aspectRatio = (float)originalWidth / originalHeight;
+
+                    int finalWidth;
+                    int finalHeight;
+
+                    // Determine final size while maintaining aspect ratio
+                    if(originalWidth > originalHeight)
+                    {
+                        // Landscape orientation - constrain by width
+                        finalWidth = Math.Min(maxWidthPixels, originalWidth);
+                        finalHeight = (int)(finalWidth / aspectRatio);
+
+                        // Check if height exceeds max
+                        if(finalHeight > maxHeightPixels)
+                        {
+                            finalHeight = maxHeightPixels;
+                            finalWidth = (int)(finalHeight * aspectRatio);
+                        }
+                    }
+                    else
+                    {
+                        // Portrait orientation - constrain by height
+                        finalHeight = Math.Min(maxHeightPixels, originalHeight);
+                        finalWidth = (int)(finalHeight * aspectRatio);
+
+                        // Check if width exceeds max
+                        if(finalWidth > maxWidthPixels)
+                        {
+                            finalWidth = maxWidthPixels;
+                            finalHeight = (int)(finalWidth / aspectRatio);
+                        }
+                    }
+
+                    // Create unique name for the picture
+                    string pictureName = $"Img_{row}_{col}_{DateTime.Now.Ticks}";
+
+                    // Add picture to worksheet
+                    var picture = worksheet.Drawings.AddPicture(pictureName, new FileInfo(imagePath));
+
+                    // Position the picture to align with the cell (center it)
+                    int rowOffset = Math.Max(2, (maxHeightPixels - finalHeight) / 2);
+                    int colOffset = Math.Max(2, (maxWidthPixels - finalWidth) / 2);
+
+                    picture.SetPosition(row - 1, rowOffset, col - 1, colOffset);
+
+                    // Set the calculated size
+                    picture.SetSize(finalWidth, finalHeight);
+
+                    // Center align the cell
+                    worksheet.Cells[row, col].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                    worksheet.Cells[row, col].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                }
+            }
+            catch(Exception ex)
+            {
+                // Silently handle errors
+            }
         }
     }
-
-
 }

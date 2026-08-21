@@ -18,7 +18,7 @@ namespace VietANPR_UI
     {
         static FormWebcam m_instance;
         VideoCaptureDevice m_videoSource;
-        Bitmap g_bmp;
+        Bitmap _bmp;
 
         private static Random random = new Random();
         Stopwatch m_watch;
@@ -28,6 +28,11 @@ namespace VietANPR_UI
         public FormWebcam()
         {
             InitializeComponent();
+
+            this.AutoScaleMode = AutoScaleMode.None;
+            this.TopLevel = false;
+            this.Dock = DockStyle.Fill;
+            this.FormBorderStyle = FormBorderStyle.None;
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -44,14 +49,78 @@ namespace VietANPR_UI
         private void Form1_Load(object sender, EventArgs e)
         {
             Directory.CreateDirectory("input");
-            InitCamera();
+            LoadWebcam();
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        void InitCamera()
+        private void FormWebcam_FormClosed(object sender, FormClosedEventArgs e)
         {
-            cbCamera.Items.Clear();
+            timerProgressbar.Stop();
+            StopWebcam();
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public void OnFormSelected(bool selected)
+        {
+            if (selected)
+            {
+
+            }
+            else
+            {
+
+            }
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private void FormWebcam_VisibleChanged(object sender, EventArgs e)
+        {
+            if (this.Visible)
+            {
+                if (cb_webcam.Items.Count == 1)
+                {
+                    cb_webcam.SelectedIndex = 0;
+                }
+            }
+            else
+            {
+                StopWebcam();
+                cb_webcam.SelectedIndex = -1;
+            }
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private void cbCamera_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            LoadResolution();
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private void btnRead_Click(object sender, EventArgs e)
+        {
+            if (btnRead.Text == "Start")
+            {
+                StartWebcam();
+                btnRead.Text = "Read";
+            }
+            else
+            {
+                btnRead.Text = "Start";
+                StopWebcam();
+                ReadPlateAsync();
+            }           
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        void LoadWebcam()
+        {
+            cb_webcam.Items.Clear();
 
             FilterInfoCollection videosources = new FilterInfoCollection(FilterCategory.VideoInputDevice);
 
@@ -64,27 +133,20 @@ namespace VietANPR_UI
 
             for (int i = 0; i < videosources.Count; i++)
             {
-                cbCamera.Items.Add(videosources[i].Name);
+                cb_webcam.Items.Add(videosources[i].Name);
             }
-            cbCamera.Enabled = true;
-            if(cbCamera.Items.Count == 1)
+            cb_webcam.Enabled = true;
+            if (cb_webcam.Items.Count == 1)
             {
-                cbCamera.SelectedIndex = 0;
+                cb_webcam.SelectedIndex = 0;
             }
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private void cbCamera_SelectedIndexChanged(object sender, EventArgs e)
+        void StartWebcam()
         {
-            ConnectLocalCamera();
-        }
-
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        void ConnectLocalCamera()
-        {
-            if (cbCamera.Items.Count == 0 || cbCamera.SelectedIndex == -1)
+            if (cb_webcam.Items.Count == 0 || cb_webcam.SelectedIndex == -1)
                 return;
             if (m_videoSource != null)
             {
@@ -93,23 +155,22 @@ namespace VietANPR_UI
             else
             {
                 FilterInfoCollection videosources = new FilterInfoCollection(FilterCategory.VideoInputDevice);
-                m_videoSource = new VideoCaptureDevice(videosources[cbCamera.SelectedIndex].MonikerString);
+                m_videoSource = new VideoCaptureDevice(videosources[cb_webcam.SelectedIndex].MonikerString);
             }
 
-            m_videoSource.NewFrame += new NewFrameEventHandler(OnCameraFrame);
+            m_videoSource.NewFrame += new NewFrameEventHandler(OnWebcamFrame);
             m_videoSource.Start();
-            btnRead.Enabled = true;
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        void OnCameraFrame(object sender, NewFrameEventArgs eventArgs)
+        void OnWebcamFrame(object sender, NewFrameEventArgs eventArgs)
         {
-            if (g_bmp != null)
-                g_bmp.Dispose();
+            if (_bmp != null)
+                _bmp.Dispose();
 
 
-            g_bmp = (Bitmap)eventArgs.Frame.Clone();
+            _bmp = (Bitmap)eventArgs.Frame.Clone();
             picCamera.Image = (Bitmap)eventArgs.Frame.Clone();
         }
 
@@ -120,101 +181,91 @@ namespace VietANPR_UI
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             return new string(Enumerable.Repeat(chars, length)
                 .Select(s => s[random.Next(s.Length)]).ToArray());
-        }
+        }        
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private void btnRead_Click(object sender, EventArgs e)
+        public void StopWebcam()
         {
-            if (g_bmp == null)
-            {
+            if (m_videoSource != null)
+                m_videoSource.Stop();
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        void LoadResolution()
+        {
+            if (cb_webcam.Items.Count == 0)
                 return;
+
+            FilterInfoCollection videosources = new FilterInfoCollection(FilterCategory.VideoInputDevice);
+            VideoCaptureDevice videoSource = new VideoCaptureDevice(videosources[cb_webcam.SelectedIndex].MonikerString);
+
+            cb_resolution.Items.Clear();
+            foreach (var cap in videoSource.VideoCapabilities)
+            {
+                cb_resolution.Items.Add(cap.FrameSize.Width + "x" + cap.FrameSize.Height + " (" + cap.MaximumFrameRate + " FPS)");
             }
-
-            string filePath = "input\\" + DateTime.Now.ToString("yyyy-MM-dd-hh-mm-ss") + "_" + RandomString(10) + ".jpg";
-            g_bmp.Save(filePath, ImageFormat.Jpeg);
-
-            btnRead.Enabled = false;
-            FormMain.GetInstance().PrintMessage("");
-            FormMain.GetInstance().StartProgressbar();
-
-            
-            Thread t = new Thread(() => Read((Bitmap)g_bmp.Clone()));
-            t.Start();            
+            if (cb_resolution.Items.Count > 0)
+            {
+                cb_resolution.SelectedIndex = 0;
+            }
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        void Read(Bitmap bmp)
+        void ReadPlateAsync()
+        {
+            if(chk_save.Checked)
+            {
+                string filePath = "input\\" + DateTime.Now.ToString("yyyy-MM-dd-hh-mm-ss") + ".jpg";
+                _bmp.Save(filePath, ImageFormat.Jpeg);
+            }            
+
+            FormMain.GetInstance().PrintMessage("");
+            circle1.Visible = true;
+
+
+            Thread t = new Thread(() => ReadPlate((Bitmap)_bmp.Clone()));
+            t.Start();
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        void ReadPlate(Bitmap bmp)
         {
             m_watch = Stopwatch.StartNew();
-            VehiclePlate[] plates = Program.reader.Reads(bmp);
+            VehiclePlate[] plates = Program.reader.Reads(bmp, false);
             m_watch.Stop();
 
+            circle1.Visible = false;
+
             if (plates.Length == 0)
+            {
+                lbl_result.Text = "Không tìm thấy biển số";
                 return;
+            }
+                
 
             VehiclePlate plate = plates[0];
 
             this.Invoke(new Action(() =>
             {
-                FormMain.GetInstance().StopProgressbar();
+                FormMain.GetInstance().PrintMessage("Elapsed: " + m_watch.ElapsedMilliseconds.ToString() + "ms");
+
                 lbl_result.Text = plate.text;
 
-                lbl_result.ForeColor = plate.isValid ? Color.White : Color.Red;
+                lbl_result.ForeColor = plate.isValid ? Color.FromArgb(21, 66, 139) : Color.Red;
 
                 if (plate.bitmap == null)
                 {
-                    FormMain.GetInstance().PrintError(plate.error);
+                    lbl_result.Text = plate.error;
                 }
                 else
                 {
-                    picResult.Image = plate.bitmap;
-                    FormMain.GetInstance().PrintMessage("Elapsed: " + m_watch.ElapsedMilliseconds.ToString() + "ms");
+                    picResult.Image = plate.bitmap;                    
                 }
-                
-
-                btnRead.Enabled = true;
-                
             }));
-        }
-
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        private void FormWebcam_VisibleChanged(object sender, EventArgs e)
-        {
-            if (this.Visible)
-            {
-                if(cbCamera.Items.Count == 1)
-                {
-                    cbCamera.SelectedIndex = 0;
-                }
-            }
-            else
-            {
-                StopAllCamera();
-                cbCamera.SelectedIndex = -1;
-            }
-        }
-
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public void StopAllCamera()
-        {
-
-            if (m_videoSource != null)
-                m_videoSource.Stop();
-
-            picCamera.Image = null;
-            btnRead.Enabled = false;
-        }
-
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        private void FormWebcam_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            timerProgressbar.Stop();
-            StopAllCamera();
         }
     }
 }

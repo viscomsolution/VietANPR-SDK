@@ -30,224 +30,30 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
-            this.panelMenu = new System.Windows.Forms.Panel();
-            this.btnSettings = new System.Windows.Forms.Button();
-            this.btn_realtime = new System.Windows.Forms.Button();
-            this.btn_ipCamera = new System.Windows.Forms.Button();
-            this.progressBar1 = new System.Windows.Forms.ProgressBar();
-            this.btnFolder = new System.Windows.Forms.Button();
-            this.btnWebcam = new System.Windows.Forms.Button();
-            this.btnImage = new System.Windows.Forms.Button();
-            this.panelLogo = new System.Windows.Forms.Panel();
-            this.lbl_version = new System.Windows.Forms.Label();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.label1 = new System.Windows.Forms.Label();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.progressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             this.lblMessage = new System.Windows.Forms.ToolStripStatusLabel();
-            this.panelDesktop = new System.Windows.Forms.Panel();
             this.timerProgressbar = new System.Windows.Forms.Timer(this.components);
             this.timerClear = new System.Windows.Forms.Timer(this.components);
             this.timerRefresh = new System.Windows.Forms.Timer(this.components);
-            this.panelMenu.SuspendLayout();
-            this.panelLogo.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.gradientTab1 = new TGMTcontrols.GradientTab();
+            this.panelTop = new TGMTcontrols.GradientPanel();
+            this.label8 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.statusStrip1.SuspendLayout();
+            this.gradientTab1.SuspendLayout();
+            this.panelTop.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
-            // 
-            // panelMenu
-            // 
-            this.panelMenu.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(76)))));
-            this.panelMenu.Controls.Add(this.btnSettings);
-            this.panelMenu.Controls.Add(this.btn_realtime);
-            this.panelMenu.Controls.Add(this.btn_ipCamera);
-            this.panelMenu.Controls.Add(this.progressBar1);
-            this.panelMenu.Controls.Add(this.btnFolder);
-            this.panelMenu.Controls.Add(this.btnWebcam);
-            this.panelMenu.Controls.Add(this.btnImage);
-            this.panelMenu.Controls.Add(this.panelLogo);
-            this.panelMenu.Dock = System.Windows.Forms.DockStyle.Left;
-            this.panelMenu.Location = new System.Drawing.Point(0, 0);
-            this.panelMenu.Name = "panelMenu";
-            this.panelMenu.Size = new System.Drawing.Size(200, 679);
-            this.panelMenu.TabIndex = 16;
-            // 
-            // btnSettings
-            // 
-            this.btnSettings.Dock = System.Windows.Forms.DockStyle.Top;
-            this.btnSettings.FlatAppearance.BorderSize = 0;
-            this.btnSettings.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnSettings.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnSettings.ForeColor = System.Drawing.Color.Gainsboro;
-            this.btnSettings.Image = global::VietANPR_UI.Properties.Resources.cog;
-            this.btnSettings.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnSettings.Location = new System.Drawing.Point(0, 370);
-            this.btnSettings.Name = "btnSettings";
-            this.btnSettings.Padding = new System.Windows.Forms.Padding(12, 0, 0, 0);
-            this.btnSettings.Size = new System.Drawing.Size(200, 60);
-            this.btnSettings.TabIndex = 8;
-            this.btnSettings.Text = " Settings";
-            this.btnSettings.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnSettings.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.btnSettings.UseVisualStyleBackColor = true;
-            this.btnSettings.Click += new System.EventHandler(this.btnSettings_Click);
-            // 
-            // btn_realtime
-            // 
-            this.btn_realtime.Dock = System.Windows.Forms.DockStyle.Top;
-            this.btn_realtime.FlatAppearance.BorderSize = 0;
-            this.btn_realtime.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btn_realtime.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btn_realtime.ForeColor = System.Drawing.Color.Gainsboro;
-            this.btn_realtime.Image = global::VietANPR_UI.Properties.Resources.car_running_32;
-            this.btn_realtime.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btn_realtime.Location = new System.Drawing.Point(0, 310);
-            this.btn_realtime.Name = "btn_realtime";
-            this.btn_realtime.Padding = new System.Windows.Forms.Padding(12, 0, 0, 0);
-            this.btn_realtime.Size = new System.Drawing.Size(200, 60);
-            this.btn_realtime.TabIndex = 10;
-            this.btn_realtime.Text = "  Realtime";
-            this.btn_realtime.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btn_realtime.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.btn_realtime.UseVisualStyleBackColor = true;
-            this.btn_realtime.Click += new System.EventHandler(this.btn_realtime_Click);
-            // 
-            // btn_ipCamera
-            // 
-            this.btn_ipCamera.Dock = System.Windows.Forms.DockStyle.Top;
-            this.btn_ipCamera.FlatAppearance.BorderSize = 0;
-            this.btn_ipCamera.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btn_ipCamera.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btn_ipCamera.ForeColor = System.Drawing.Color.Gainsboro;
-            this.btn_ipCamera.Image = global::VietANPR_UI.Properties.Resources.cctv_32px;
-            this.btn_ipCamera.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btn_ipCamera.Location = new System.Drawing.Point(0, 250);
-            this.btn_ipCamera.Name = "btn_ipCamera";
-            this.btn_ipCamera.Padding = new System.Windows.Forms.Padding(12, 0, 0, 0);
-            this.btn_ipCamera.Size = new System.Drawing.Size(200, 60);
-            this.btn_ipCamera.TabIndex = 9;
-            this.btn_ipCamera.Text = " IP camera";
-            this.btn_ipCamera.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btn_ipCamera.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.btn_ipCamera.UseVisualStyleBackColor = true;
-            this.btn_ipCamera.Visible = false;
-            this.btn_ipCamera.Click += new System.EventHandler(this.btn_ipCamera_Click);
-            // 
-            // progressBar1
-            // 
-            this.progressBar1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.progressBar1.Location = new System.Drawing.Point(0, 656);
-            this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(200, 23);
-            this.progressBar1.TabIndex = 7;
-            // 
-            // btnFolder
-            // 
-            this.btnFolder.Dock = System.Windows.Forms.DockStyle.Top;
-            this.btnFolder.FlatAppearance.BorderSize = 0;
-            this.btnFolder.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnFolder.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnFolder.ForeColor = System.Drawing.Color.Gainsboro;
-            this.btnFolder.Image = global::VietANPR_UI.Properties.Resources.folder_32px;
-            this.btnFolder.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnFolder.Location = new System.Drawing.Point(0, 190);
-            this.btnFolder.Name = "btnFolder";
-            this.btnFolder.Padding = new System.Windows.Forms.Padding(12, 0, 0, 0);
-            this.btnFolder.Size = new System.Drawing.Size(200, 60);
-            this.btnFolder.TabIndex = 6;
-            this.btnFolder.Text = "   Folder";
-            this.btnFolder.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnFolder.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.btnFolder.UseVisualStyleBackColor = true;
-            this.btnFolder.Click += new System.EventHandler(this.btnFolder_Click);
-            // 
-            // btnWebcam
-            // 
-            this.btnWebcam.Dock = System.Windows.Forms.DockStyle.Top;
-            this.btnWebcam.FlatAppearance.BorderSize = 0;
-            this.btnWebcam.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnWebcam.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnWebcam.ForeColor = System.Drawing.Color.Gainsboro;
-            this.btnWebcam.Image = global::VietANPR_UI.Properties.Resources.webcam_32;
-            this.btnWebcam.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnWebcam.Location = new System.Drawing.Point(0, 130);
-            this.btnWebcam.Name = "btnWebcam";
-            this.btnWebcam.Padding = new System.Windows.Forms.Padding(12, 0, 0, 0);
-            this.btnWebcam.Size = new System.Drawing.Size(200, 60);
-            this.btnWebcam.TabIndex = 2;
-            this.btnWebcam.Text = " Webcam";
-            this.btnWebcam.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnWebcam.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.btnWebcam.UseVisualStyleBackColor = true;
-            this.btnWebcam.Click += new System.EventHandler(this.btnWebcam_Click);
-            // 
-            // btnImage
-            // 
-            this.btnImage.Dock = System.Windows.Forms.DockStyle.Top;
-            this.btnImage.FlatAppearance.BorderSize = 0;
-            this.btnImage.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnImage.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnImage.ForeColor = System.Drawing.Color.Gainsboro;
-            this.btnImage.Image = global::VietANPR_UI.Properties.Resources.picture_32;
-            this.btnImage.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnImage.Location = new System.Drawing.Point(0, 70);
-            this.btnImage.Name = "btnImage";
-            this.btnImage.Padding = new System.Windows.Forms.Padding(12, 0, 0, 0);
-            this.btnImage.Size = new System.Drawing.Size(200, 60);
-            this.btnImage.TabIndex = 1;
-            this.btnImage.Text = "  Image";
-            this.btnImage.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnImage.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.btnImage.UseVisualStyleBackColor = true;
-            this.btnImage.Click += new System.EventHandler(this.btnImage_Click);
-            // 
-            // panelLogo
-            // 
-            this.panelLogo.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(234)))), ((int)(((byte)(72)))), ((int)(((byte)(51)))));
-            this.panelLogo.Controls.Add(this.lbl_version);
-            this.panelLogo.Controls.Add(this.pictureBox1);
-            this.panelLogo.Controls.Add(this.label1);
-            this.panelLogo.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panelLogo.Location = new System.Drawing.Point(0, 0);
-            this.panelLogo.Name = "panelLogo";
-            this.panelLogo.Size = new System.Drawing.Size(200, 70);
-            this.panelLogo.TabIndex = 0;
-            // 
-            // lbl_version
-            // 
-            this.lbl_version.AutoSize = true;
-            this.lbl_version.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lbl_version.ForeColor = System.Drawing.Color.White;
-            this.lbl_version.Location = new System.Drawing.Point(86, 41);
-            this.lbl_version.Name = "lbl_version";
-            this.lbl_version.Size = new System.Drawing.Size(56, 17);
-            this.lbl_version.TabIndex = 2;
-            this.lbl_version.Text = "Version";
-            // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Image = global::VietANPR_UI.Properties.Resources.icon_number_plate_white;
-            this.pictureBox1.InitialImage = ((System.Drawing.Image)(resources.GetObject("pictureBox1.InitialImage")));
-            this.pictureBox1.Location = new System.Drawing.Point(3, 3);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(72, 64);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox1.TabIndex = 1;
-            this.pictureBox1.TabStop = false;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Segoe UI", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.ForeColor = System.Drawing.Color.White;
-            this.label1.Location = new System.Drawing.Point(76, 7);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(115, 30);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "VietANPR";
             // 
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.progressBar1,
             this.lblMessage});
             this.statusStrip1.Location = new System.Drawing.Point(0, 679);
             this.statusStrip1.Name = "statusStrip1";
@@ -256,19 +62,16 @@
             this.statusStrip1.TabIndex = 18;
             this.statusStrip1.Text = "statusStrip1";
             // 
+            // progressBar1
+            // 
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.Size = new System.Drawing.Size(100, 16);
+            // 
             // lblMessage
             // 
             this.lblMessage.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.lblMessage.Name = "lblMessage";
             this.lblMessage.Size = new System.Drawing.Size(0, 17);
-            // 
-            // panelDesktop
-            // 
-            this.panelDesktop.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelDesktop.Location = new System.Drawing.Point(200, 0);
-            this.panelDesktop.Name = "panelDesktop";
-            this.panelDesktop.Size = new System.Drawing.Size(987, 679);
-            this.panelDesktop.TabIndex = 17;
             // 
             // timerProgressbar
             // 
@@ -285,49 +88,146 @@
             this.timerRefresh.Enabled = true;
             this.timerRefresh.Interval = 300000;
             // 
+            // tabPage3
+            // 
+            this.tabPage3.Location = new System.Drawing.Point(4, 34);
+            this.tabPage3.Name = "tabPage3";
+            this.tabPage3.Size = new System.Drawing.Size(1179, 547);
+            this.tabPage3.TabIndex = 2;
+            this.tabPage3.Text = "Webcam";
+            this.tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.Location = new System.Drawing.Point(4, 34);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(1179, 547);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "Folder";
+            this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(232)))), ((int)(((byte)(240)))), ((int)(((byte)(250)))));
+            this.tabPage1.Font = new System.Drawing.Font("Segoe UI", 11F);
+            this.tabPage1.Location = new System.Drawing.Point(4, 34);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(1179, 547);
+            this.tabPage1.TabIndex = 0;
+            this.tabPage1.Text = "Image";
+            // 
+            // gradientTab1
+            // 
+            this.gradientTab1.Controls.Add(this.tabPage1);
+            this.gradientTab1.Controls.Add(this.tabPage2);
+            this.gradientTab1.Controls.Add(this.tabPage3);
+            this.gradientTab1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.gradientTab1.DrawMode = System.Windows.Forms.TabDrawMode.OwnerDrawFixed;
+            this.gradientTab1.Font = new System.Drawing.Font("Segoe UI", 11F);
+            this.gradientTab1.ImageLocation = new System.Drawing.Point(0, 0);
+            this.gradientTab1.ImageSize = new System.Drawing.Size(0, 0);
+            this.gradientTab1.ItemSize = new System.Drawing.Size(100, 30);
+            this.gradientTab1.Location = new System.Drawing.Point(0, 94);
+            this.gradientTab1.Name = "gradientTab1";
+            this.gradientTab1.SelectedIndex = 0;
+            this.gradientTab1.Size = new System.Drawing.Size(1187, 585);
+            this.gradientTab1.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
+            this.gradientTab1.TabIndex = 19;
+            this.gradientTab1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
+            // 
+            // panelTop
+            // 
+            this.panelTop.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(217)))), ((int)(((byte)(217)))), ((int)(((byte)(217)))));
+            this.panelTop.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(217)))), ((int)(((byte)(217)))), ((int)(((byte)(217)))));
+            this.panelTop.BorderThickness = 1;
+            this.panelTop.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(241)))), ((int)(((byte)(245)))));
+            this.panelTop.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(236)))), ((int)(((byte)(241)))), ((int)(((byte)(247)))));
+            this.panelTop.Controls.Add(this.label8);
+            this.panelTop.Controls.Add(this.label3);
+            this.panelTop.Controls.Add(this.pictureBox1);
+            this.panelTop.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panelTop.GradientDirection = System.Drawing.Drawing2D.LinearGradientMode.Horizontal;
+            this.panelTop.Location = new System.Drawing.Point(0, 0);
+            this.panelTop.Name = "panelTop";
+            this.panelTop.Size = new System.Drawing.Size(1187, 94);
+            this.panelTop.TabIndex = 32;
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.BackColor = System.Drawing.Color.Transparent;
+            this.label8.Font = new System.Drawing.Font("Segoe UI Semibold", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label8.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(82)))), ((int)(((byte)(125)))));
+            this.label8.Location = new System.Drawing.Point(114, 58);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(334, 25);
+            this.label8.TabIndex = 32;
+            this.label8.Text = "Phần mềm nhận diện biển số tự động";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.BackColor = System.Drawing.Color.Transparent;
+            this.label3.Font = new System.Drawing.Font("Segoe UI", 30F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(46)))), ((int)(((byte)(79)))), ((int)(((byte)(109)))));
+            this.label3.Location = new System.Drawing.Point(111, 3);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(221, 54);
+            this.label3.TabIndex = 31;
+            this.label3.Text = "Viet ANPR";
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(241)))), ((int)(((byte)(245)))));
+            this.pictureBox1.Image = global::VietANPR_UI.Properties.Resources.plate;
+            this.pictureBox1.Location = new System.Drawing.Point(12, 7);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(89, 80);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox1.TabIndex = 30;
+            this.pictureBox1.TabStop = false;
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1187, 701);
-            this.Controls.Add(this.panelDesktop);
-            this.Controls.Add(this.panelMenu);
+            this.Controls.Add(this.gradientTab1);
             this.Controls.Add(this.statusStrip1);
+            this.Controls.Add(this.panelTop);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "FormMain";
             this.Text = "Việt ANPR | Phần mềm đọc biển số xe máy - xe hơi ";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
             this.Load += new System.EventHandler(this.FormMain_Load);
-            this.panelMenu.ResumeLayout(false);
-            this.panelLogo.ResumeLayout(false);
-            this.panelLogo.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            this.Shown += new System.EventHandler(this.FormMain_Shown);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
+            this.gradientTab1.ResumeLayout(false);
+            this.panelTop.ResumeLayout(false);
+            this.panelTop.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
 
         #endregion
-
-        private System.Windows.Forms.Panel panelMenu;
-        private System.Windows.Forms.ProgressBar progressBar1;
-        private System.Windows.Forms.Button btnFolder;
-        private System.Windows.Forms.Button btnWebcam;
-        private System.Windows.Forms.Button btnImage;
-        private System.Windows.Forms.Panel panelLogo;
-        private System.Windows.Forms.PictureBox pictureBox1;
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel lblMessage;
-        private System.Windows.Forms.Panel panelDesktop;
         private System.Windows.Forms.Timer timerProgressbar;
         private System.Windows.Forms.Timer timerClear;
         private System.Windows.Forms.Timer timerRefresh;
-        private System.Windows.Forms.Button btnSettings;
-        private System.Windows.Forms.Button btn_realtime;
-        private System.Windows.Forms.Button btn_ipCamera;
-        private System.Windows.Forms.Label lbl_version;
+        private System.Windows.Forms.ToolStripProgressBar progressBar1;
+        private System.Windows.Forms.TabPage tabPage3;
+        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.TabPage tabPage1;
+        private TGMTcontrols.GradientTab gradientTab1;
+        private TGMTcontrols.GradientPanel panelTop;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.PictureBox pictureBox1;
     }
 }

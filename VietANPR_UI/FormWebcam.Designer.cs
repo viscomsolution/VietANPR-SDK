@@ -33,12 +33,16 @@
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.timerClear = new System.Windows.Forms.Timer(this.components);
             this.panelLogo = new System.Windows.Forms.Panel();
+            this.chk_save = new System.Windows.Forms.CheckBox();
+            this.circle1 = new TGMTcontrols.ProcessingControl();
+            this.cb_resolution = new System.Windows.Forms.ComboBox();
             this.btnRead = new System.Windows.Forms.Button();
-            this.cbCamera = new System.Windows.Forms.ComboBox();
+            this.cb_webcam = new System.Windows.Forms.ComboBox();
             this.lbl_result = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.label4 = new System.Windows.Forms.Label();
             this.picResult = new System.Windows.Forms.PictureBox();
             this.label3 = new System.Windows.Forms.Label();
             this.picCamera = new System.Windows.Forms.PictureBox();
@@ -68,47 +72,87 @@
             // 
             // panelLogo
             // 
-            this.panelLogo.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(67)))), ((int)(((byte)(183)))), ((int)(((byte)(110)))));
+            this.panelLogo.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(232)))), ((int)(((byte)(240)))), ((int)(((byte)(250)))));
+            this.panelLogo.Controls.Add(this.chk_save);
+            this.panelLogo.Controls.Add(this.circle1);
+            this.panelLogo.Controls.Add(this.cb_resolution);
             this.panelLogo.Controls.Add(this.btnRead);
-            this.panelLogo.Controls.Add(this.cbCamera);
+            this.panelLogo.Controls.Add(this.cb_webcam);
             this.panelLogo.Controls.Add(this.lbl_result);
             this.panelLogo.Controls.Add(this.label1);
             this.panelLogo.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelLogo.Location = new System.Drawing.Point(0, 0);
             this.panelLogo.Name = "panelLogo";
-            this.panelLogo.Size = new System.Drawing.Size(982, 70);
+            this.panelLogo.Size = new System.Drawing.Size(982, 78);
             this.panelLogo.TabIndex = 21;
+            // 
+            // chk_save
+            // 
+            this.chk_save.AutoSize = true;
+            this.chk_save.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.chk_save.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(21)))), ((int)(((byte)(66)))), ((int)(((byte)(139)))));
+            this.chk_save.Location = new System.Drawing.Point(20, 50);
+            this.chk_save.Name = "chk_save";
+            this.chk_save.Size = new System.Drawing.Size(151, 23);
+            this.chk_save.TabIndex = 19;
+            this.chk_save.Text = "Save webcam image";
+            this.chk_save.UseVisualStyleBackColor = true;
+            // 
+            // circle1
+            // 
+            this.circle1.BackColor = System.Drawing.Color.Transparent;
+            this.circle1.IndexColor = System.Drawing.Color.DeepSkyBlue;
+            this.circle1.Interval = 50;
+            this.circle1.Location = new System.Drawing.Point(642, 8);
+            this.circle1.Name = "circle1";
+            this.circle1.NCircle = 8;
+            this.circle1.Others = System.Drawing.Color.LightGray;
+            this.circle1.Radius = 4;
+            this.circle1.Size = new System.Drawing.Size(40, 40);
+            this.circle1.TabIndex = 18;
+            this.circle1.Text = "processingControl1";
+            this.circle1.Visible = false;
+            // 
+            // cb_resolution
+            // 
+            this.cb_resolution.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cb_resolution.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.cb_resolution.FormattingEnabled = true;
+            this.cb_resolution.Location = new System.Drawing.Point(351, 17);
+            this.cb_resolution.Name = "cb_resolution";
+            this.cb_resolution.Size = new System.Drawing.Size(150, 25);
+            this.cb_resolution.TabIndex = 17;
             // 
             // btnRead
             // 
             this.btnRead.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(148)))), ((int)(((byte)(188)))));
             this.btnRead.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
             this.btnRead.ForeColor = System.Drawing.Color.White;
-            this.btnRead.Location = new System.Drawing.Point(372, 14);
+            this.btnRead.Location = new System.Drawing.Point(509, 11);
             this.btnRead.Name = "btnRead";
-            this.btnRead.Size = new System.Drawing.Size(129, 35);
+            this.btnRead.Size = new System.Drawing.Size(106, 35);
             this.btnRead.TabIndex = 4;
-            this.btnRead.Text = "Chụp ảnh";
+            this.btnRead.Text = "Start";
             this.btnRead.UseVisualStyleBackColor = false;
             this.btnRead.Click += new System.EventHandler(this.btnRead_Click);
             // 
-            // cbCamera
+            // cb_webcam
             // 
-            this.cbCamera.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbCamera.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cbCamera.FormattingEnabled = true;
-            this.cbCamera.Location = new System.Drawing.Point(102, 19);
-            this.cbCamera.Name = "cbCamera";
-            this.cbCamera.Size = new System.Drawing.Size(264, 25);
-            this.cbCamera.TabIndex = 3;
-            this.cbCamera.SelectedIndexChanged += new System.EventHandler(this.cbCamera_SelectedIndexChanged);
+            this.cb_webcam.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cb_webcam.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.cb_webcam.FormattingEnabled = true;
+            this.cb_webcam.Location = new System.Drawing.Point(81, 17);
+            this.cb_webcam.Name = "cb_webcam";
+            this.cb_webcam.Size = new System.Drawing.Size(264, 25);
+            this.cb_webcam.TabIndex = 3;
+            this.cb_webcam.SelectedIndexChanged += new System.EventHandler(this.cbCamera_SelectedIndexChanged);
             // 
             // lbl_result
             // 
             this.lbl_result.AutoSize = true;
             this.lbl_result.Font = new System.Drawing.Font("Segoe UI", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lbl_result.ForeColor = System.Drawing.Color.White;
-            this.lbl_result.Location = new System.Drawing.Point(507, 16);
+            this.lbl_result.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(21)))), ((int)(((byte)(66)))), ((int)(((byte)(139)))));
+            this.lbl_result.Location = new System.Drawing.Point(703, 14);
             this.lbl_result.Name = "lbl_result";
             this.lbl_result.Size = new System.Drawing.Size(76, 30);
             this.lbl_result.TabIndex = 2;
@@ -117,11 +161,11 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.ForeColor = System.Drawing.Color.White;
+            this.label1.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.label1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(21)))), ((int)(((byte)(66)))), ((int)(((byte)(139)))));
             this.label1.Location = new System.Drawing.Point(16, 20);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(70, 21);
+            this.label1.Size = new System.Drawing.Size(61, 19);
             this.label1.TabIndex = 0;
             this.label1.Text = "Webcam";
             // 
@@ -132,29 +176,41 @@
             this.panel1.Controls.Add(this.label2);
             this.panel1.Controls.Add(this.picWebcam);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(0, 70);
+            this.panel1.Location = new System.Drawing.Point(0, 78);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(982, 408);
+            this.panel1.Size = new System.Drawing.Size(982, 400);
             this.panel1.TabIndex = 24;
             // 
             // panel2
             // 
-            this.panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(148)))), ((int)(((byte)(188)))));
+            this.panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(232)))), ((int)(((byte)(240)))), ((int)(((byte)(250)))));
+            this.panel2.Controls.Add(this.label4);
             this.panel2.Controls.Add(this.picResult);
             this.panel2.Controls.Add(this.label3);
             this.panel2.Controls.Add(this.picCamera);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel2.Location = new System.Drawing.Point(0, 0);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(982, 408);
+            this.panel2.Size = new System.Drawing.Size(982, 400);
             this.panel2.TabIndex = 26;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
+            this.label4.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(21)))), ((int)(((byte)(66)))), ((int)(((byte)(139)))));
+            this.label4.Location = new System.Drawing.Point(726, 11);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(66, 25);
+            this.label4.TabIndex = 27;
+            this.label4.Text = "Result";
             // 
             // picResult
             // 
             this.picResult.BackColor = System.Drawing.Color.White;
             this.picResult.Location = new System.Drawing.Point(489, 39);
             this.picResult.Name = "picResult";
-            this.picResult.Size = new System.Drawing.Size(480, 320);
+            this.picResult.Size = new System.Drawing.Size(480, 304);
             this.picResult.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.picResult.TabIndex = 26;
             this.picResult.TabStop = false;
@@ -163,7 +219,7 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
-            this.label3.ForeColor = System.Drawing.Color.White;
+            this.label3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(21)))), ((int)(((byte)(66)))), ((int)(((byte)(139)))));
             this.label3.Location = new System.Drawing.Point(188, 11);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(88, 25);
@@ -175,7 +231,7 @@
             this.picCamera.BackColor = System.Drawing.Color.White;
             this.picCamera.Location = new System.Drawing.Point(3, 39);
             this.picCamera.Name = "picCamera";
-            this.picCamera.Size = new System.Drawing.Size(480, 320);
+            this.picCamera.Size = new System.Drawing.Size(480, 304);
             this.picCamera.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.picCamera.TabIndex = 24;
             this.picCamera.TabStop = false;
@@ -239,9 +295,13 @@
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.PictureBox picCamera;
-        private System.Windows.Forms.ComboBox cbCamera;
+        private System.Windows.Forms.ComboBox cb_webcam;
         private System.Windows.Forms.Button btnRead;
         private System.Windows.Forms.PictureBox picResult;
+        private System.Windows.Forms.ComboBox cb_resolution;
+        private TGMTcontrols.ProcessingControl circle1;
+        private System.Windows.Forms.CheckBox chk_save;
+        private System.Windows.Forms.Label label4;
     }
 }
 
