@@ -1,6 +1,11 @@
-﻿using System;
+﻿//CÔNG TY TNHH GIẢI PHÁP THỊ GIÁC MÁY TÍNH
+//support@viscomsolution.com
+//0939.825.125
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -28,7 +33,7 @@ namespace TGMTcs
         public static string GetStartupPath()
         {
             string startupPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            return startupPath;
+            return CorrectPath(startupPath);
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -38,8 +43,8 @@ namespace TGMTcs
             System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
             FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
             string version = fvi.FileVersion;
-            int lastDotIdx = version.LastIndexOf('.');
-            return version.Substring(0, lastDotIdx);
+            var parts = version.Split('.');
+            return $"{parts[0]}.{parts[1]}";
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,6 +52,14 @@ namespace TGMTcs
         public static string GetPlaform()
         {
             return IntPtr.Size == 4 ? "x86" : "x64";
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static string ConvertToAlphanumeric(string str)
+        {
+            str = Regex.Replace(str, "[^0-9a-zA-Z]+", "");
+            return str;
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -152,9 +165,20 @@ namespace TGMTcs
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        
+        public static bool IsUnicodePath(string path)
+        {
+            return path.Any(c => c > 127);
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
         public static string RemoveVNaccent(string accentedStr)
         {
+            if (string.IsNullOrEmpty(accentedStr))
+                return accentedStr;
+
             //Test case: Nguyễn Ngọc Hoàng
             string result = accentedStr;
 
@@ -204,11 +228,28 @@ namespace TGMTcs
 
         public static string RandomString(int length)
         {
-            Random random = new Random();
-            const string chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-            return new string(Enumerable.Repeat(chars, length)
-                .Select(s => s[random.Next(s.Length)]).ToArray());
+            string random = Guid.NewGuid().ToString("N").Substring(0, length);
+            return random;
         }
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        
+        public static string GetCurrentDateTime(bool removeSpecialCharacter)
+        {
+            DateTime now = DateTime.Now;
+            string format = "yyyy-MM-dd.HH:mm:ss";
+            string dateTime = now.ToString(format, CultureInfo.InvariantCulture);
+
+            if (removeSpecialCharacter)
+            {
+                dateTime = dateTime.Replace(":", "-");
+            }
+
+            return dateTime;
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        
     }
 }
 

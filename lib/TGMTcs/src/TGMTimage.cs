@@ -1,4 +1,9 @@
-﻿using System;
+﻿//CÔNG TY TNHH GIẢI PHÁP THỊ GIÁC MÁY TÍNH
+//support@viscomsolution.com
+//0939.825.125
+
+using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -11,6 +16,9 @@ namespace TGMTcs
 
         public static Bitmap CorrectOrientation(Bitmap bmp)
         {
+            if (bmp == null)
+                return null;
+
             if (Array.IndexOf(bmp.PropertyIdList, 274) > -1)
             {
                 var orientation = (int)bmp.GetPropertyItem(274).Value[0];
@@ -63,13 +71,30 @@ namespace TGMTcs
 
         public static Image Base64ToImage(string base64String)
         {
+            // Preprocess base 64 string
+            base64String = base64String.Replace("%2F", "/");
+            base64String = base64String.Replace("%2B", "+");
+            base64String = base64String.Replace("%3D", "=");
+            base64String = base64String.TrimEnd('\r', '\n');
+            base64String = base64String.Replace("\r", "").Replace("\n", "");
+            base64String = base64String.PadRight(base64String.Length + (4 - base64String.Length % 4) % 4, '='); 
+
             // Convert base 64 string to byte[]
             byte[] imageBytes = Convert.FromBase64String(base64String);
+            
             // Convert byte[] to Image
             using (var ms = new MemoryStream(imageBytes, 0, imageBytes.Length))
             {
-                Image image = Image.FromStream(ms, true);
-                return image;
+                using (Image img = Image.FromStream(ms, true))
+                {
+                    Bitmap bmp = new Bitmap(img.Width, img.Height, PixelFormat.Format24bppRgb);
+                    using (Graphics g = Graphics.FromImage(bmp))
+                    {
+                        g.DrawImage(img, 0, 0, img.Width, img.Height);
+                    }
+
+                    return bmp;
+                }
             }
         }
 
@@ -109,10 +134,6 @@ namespace TGMTcs
 
         public static bool IsImage(string fileName)
         {
-            if (fileName.Contains(" "))
-            {
-                return false;
-            }
             string ext = Path.GetExtension(fileName).ToLower();
             return (ext == ".jpg" || ext == ".png" || ext == ".bmp");
         }
@@ -129,31 +150,46 @@ namespace TGMTcs
             return true;
         }
 
+        //public static Bitmap ResizeBitmap(Image image, int width, int height)
+        //{
+        //    var destRect = new Rectangle(0, 0, width, height);
+        //    var destImage = new Bitmap(width, height, PixelFormat.Format24bppRgb);
+
+        //    destImage.SetResolution(image.HorizontalResolution, image.VerticalResolution);
+
+        //    using (var graphics = Graphics.FromImage(destImage))
+        //    {
+        //        graphics.CompositingMode = CompositingMode.SourceCopy;
+        //        graphics.CompositingQuality = CompositingQuality.HighQuality;
+        //        graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+        //        graphics.SmoothingMode = SmoothingMode.HighQuality;
+        //        graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+
+        //        using (var wrapMode = new ImageAttributes())
+        //        {
+        //            wrapMode.SetWrapMode(WrapMode.TileFlipXY);
+        //            graphics.DrawImage(image, destRect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, wrapMode);
+        //        }
+        //    }
+
+        //    return destImage;
+        //}
+
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         public static Bitmap ResizeBitmap(Image image, int width, int height)
         {
-            var destRect = new Rectangle(0, 0, width, height);
-            var destImage = new Bitmap(width, height);
+            if(width == 0 || height == 0)
+                return null;
+            var dest = new Bitmap(width, height, PixelFormat.Format24bppRgb);
 
-            destImage.SetResolution(image.HorizontalResolution, image.VerticalResolution);
-
-            using (var graphics = Graphics.FromImage(destImage))
+            using (var g = Graphics.FromImage(dest))
             {
-                graphics.CompositingMode = CompositingMode.SourceCopy;
-                graphics.CompositingQuality = CompositingQuality.HighQuality;
-                graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                graphics.SmoothingMode = SmoothingMode.HighQuality;
-                graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
-
-                using (var wrapMode = new ImageAttributes())
-                {
-                    wrapMode.SetWrapMode(WrapMode.TileFlipXY);
-                    graphics.DrawImage(image, destRect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, wrapMode);
-                }
+                g.InterpolationMode = InterpolationMode.Low;
+                g.DrawImage(image, 0, 0, width, height);
             }
 
-            return destImage;
+            return dest;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -162,6 +198,16 @@ namespace TGMTcs
         {
             float ratio = (float)image.Width / (float)image.Height;
             int height = (int)((float)width / ratio);
+
+            return ResizeBitmap(image, width, height);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static Bitmap ResizeBitmapByHeight(Image image, int height)
+        {
+            float ratio = (float)image.Width / (float)image.Height;
+            int width = (int)((float)height * ratio);
 
             return ResizeBitmap(image, width, height);
         }
@@ -178,16 +224,87 @@ namespace TGMTcs
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+        public static Image ResizeImageByHeight(Image image, int height)
+        {
+            float ratio = (float)image.Width / (float)image.Height;
+            int width = (int)((float)height * ratio);
+
+            return ResizeBitmap(image, width, height);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static Bitmap ExpandBitmap(Bitmap original, int padding, Color fillColor)
+        {
+            return ExpandBitmap(original, padding, padding, padding, padding, fillColor);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static Bitmap ExpandBitmap(Bitmap original, int paddingLeft, int paddingTop, int paddingRight, int paddingBottom, Color fillColor)
+        {
+            int newWidth = original.Width + paddingLeft + paddingRight;
+            int newHeight = original.Height + paddingTop + paddingBottom;
+
+            // Create new bitmap with expanded size
+            Bitmap expanded = new Bitmap(newWidth, newHeight);
+
+            using (Graphics g = Graphics.FromImage(expanded))
+            {
+                // Fill entire new image with fill color
+                using (Brush brush = new SolidBrush(fillColor))
+                {
+                    g.FillRectangle(brush, 0, 0, newWidth, newHeight);
+                }
+
+                // Draw original image onto the new one at the correct offset
+                g.DrawImage(original, paddingLeft, paddingTop);
+            }
+
+            return expanded;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static Bitmap EnlargeSharpenBitmap(Bitmap image, int width, int height)
+        {
+            Bitmap result = new Bitmap(width, height);
+
+            using(Graphics g = Graphics.FromImage(result))
+            {
+                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
+                g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+
+                g.DrawImage(image, 0, 0, width, height);
+            }
+
+            return result;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
         public static Bitmap CropBitmap(Bitmap bmp, Rectangle rect)
         {
+            if (bmp == null)
+                return null;
+
+            if (rect.Width <= 0 || rect.Height <= 0)
+                return bmp;
+
+            if (rect.X + rect.Width > bmp.Width || rect.Y + rect.Height > bmp.Height)
+                return bmp;
+
             Bitmap target = new Bitmap(rect.Width, rect.Height);
             using (Graphics g = Graphics.FromImage(target))
             {
                 g.DrawImage(bmp, new Rectangle(0, 0, target.Width, target.Height),
                                  rect,
-                                 GraphicsUnit.Pixel);
-                return target;
+                                 GraphicsUnit.Pixel);                
             }
+
+            return target;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -215,6 +332,8 @@ namespace TGMTcs
             if(ext == ".jpg" || ext == ".png" || ext == ".bmp")
             {
                 var bytes = File.ReadAllBytes(imagePath);
+                if(bytes == null || bytes.Length == 0)
+                    return null;
                 var ms = new MemoryStream(bytes);
                 var img = Image.FromStream(ms, true);
                 return (Bitmap)img;
@@ -279,6 +398,206 @@ namespace TGMTcs
             }
 
             return rotatedImage;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static int GetNumChannels(Bitmap bitmap)
+        {
+            int numChannels = 0;
+
+            switch (bitmap.PixelFormat)
+            {
+                case PixelFormat.Format24bppRgb:
+                    numChannels = 3; // RGB
+                    break;
+                case PixelFormat.Format32bppArgb:
+                case PixelFormat.Format32bppPArgb:
+                    numChannels = 4; // RGBA
+                    break;
+                case PixelFormat.Format8bppIndexed:
+                    numChannels = 1; // Grayscale or indexed
+                    break;
+                // Add other cases if needed
+                default:
+                    numChannels = 0; // Unknown or unsupported format
+                    break;
+            }
+
+            return numChannels;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static Bitmap ConvertRGBA2RGB(Bitmap bitmap)
+        {
+            // Create a new Bitmap with 24bppRgb format (3 channels)
+            Bitmap rgbBitmap = new Bitmap(bitmap.Width, bitmap.Height, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+
+            // Iterate through each pixel
+            for (int y = 0; y < bitmap.Height; y++)
+            {
+                for (int x = 0; x < bitmap.Width; x++)
+                {
+                    // Get the pixel from the original bitmap
+                    Color pixelColor = bitmap.GetPixel(x, y);
+
+                    // Create a new color without the alpha channel (RGB only)
+                    Color rgbColor = Color.FromArgb(pixelColor.R, pixelColor.G, pixelColor.B);
+
+                    // Set the pixel in the new bitmap
+                    rgbBitmap.SetPixel(x, y, rgbColor);
+                }
+            }
+
+            return rgbBitmap;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static Bitmap CropToPolygon(Bitmap source, List<Point> polygon)
+        {
+            Rectangle boundingRect = GetPolygonBoundingBox(polygon);
+            if(boundingRect.Width == 0 || boundingRect.Height == 0)
+            {
+                return source;
+            }
+            if(boundingRect.X < 0 || boundingRect.Y < 0 || boundingRect.X + boundingRect.Width > source.Width || boundingRect.Y + boundingRect.Height > source.Height)
+            {
+                return source;
+            }
+
+            // Create a new empty bitmap with the same size as the source
+            Bitmap croppedBitmap = new Bitmap(source.Width, source.Height);
+
+            // Create a GraphicsPath from the polygon points
+            using (GraphicsPath path = new GraphicsPath())
+            {
+                path.AddPolygon(polygon.ToArray());
+
+                // Create a Region from the path
+                using (Region region = new Region(path))
+                {
+                    // Create the Graphics object for the new bitmap
+                    using (Graphics g = Graphics.FromImage(croppedBitmap))
+                    {
+                        // Clear the new bitmap with transparent background
+                        g.Clear(Color.Transparent);
+
+                        // Set the clipping region to the polygon
+                        g.SetClip(region, CombineMode.Replace);
+
+                        // Draw the source image onto the new bitmap using the clipping region
+                        g.DrawImage(source, new Rectangle(0, 0, source.Width, source.Height));
+                    }
+                }
+            }
+
+            // Crop the resulting bitmap to the bounding rectangle of the polygon
+            
+            Bitmap finalCroppedBitmap = croppedBitmap.Clone(boundingRect, PixelFormat.Format24bppRgb);
+
+            return finalCroppedBitmap;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private static Rectangle GetPolygonBoundingBox(List<Point> polygon)
+        {
+            int minX = int.MaxValue;
+            int minY = int.MaxValue;
+            int maxX = int.MinValue;
+            int maxY = int.MinValue;
+
+            foreach (var point in polygon)
+            {
+                if (point.X < minX) minX = point.X;
+                if (point.Y < minY) minY = point.Y;
+                if (point.X > maxX) maxX = point.X;
+                if (point.Y > maxY) maxY = point.Y;
+            }
+
+            return new Rectangle(minX, minY, maxX - minX, maxY - minY);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// Require call this function to clone bitmap
+
+        public static Bitmap CloneBitmap(Bitmap source)
+        {
+            if (source == null)
+                return null;
+
+            // Create a deep copy of the bitmap
+            Bitmap bmp24 = new Bitmap(source.Width, source.Height, PixelFormat.Format24bppRgb);
+
+            using (Graphics g = Graphics.FromImage(bmp24))
+            {
+                g.DrawImage(source, new Rectangle(0, 0, bmp24.Width, bmp24.Height));
+            }
+
+            return bmp24;
+        }
+
+        public static Bitmap FastClone(Bitmap src)
+        {
+            if(src == null)            
+                return null;
+            
+            // 1. Đảm bảo source là 24bpp và KHÔNG thay đổi src gốc
+            Bitmap src24 = src;
+
+            if (src.PixelFormat != PixelFormat.Format24bppRgb)
+            {
+                src24 = new Bitmap(src.Width, src.Height, PixelFormat.Format24bppRgb);
+                using (Graphics g = Graphics.FromImage(src24))
+                {
+                    g.DrawImage(src, 0, 0, src.Width, src.Height);
+                }
+            }
+
+            // 2. Tạo bitmap clone hoàn toàn mới
+            Bitmap clone = new Bitmap(src24.Width, src24.Height, PixelFormat.Format24bppRgb);
+
+            Rectangle rect = new Rectangle(0, 0, src24.Width, src24.Height);
+
+            BitmapData srcData = null;
+            BitmapData dstData = null;
+
+            try
+            {
+                srcData = src24.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+                dstData = clone.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
+
+                int bytesPerRow = src24.Width * 3;
+
+                unsafe
+                {
+                    byte* srcPtr = (byte*)srcData.Scan0;
+                    byte* dstPtr = (byte*)dstData.Scan0;
+
+                    for (int y = 0; y < src24.Height; y++)
+                    {
+                        Buffer.MemoryCopy(
+                            srcPtr + y * srcData.Stride,
+                            dstPtr + y * dstData.Stride,
+                            bytesPerRow,
+                            bytesPerRow
+                        );
+                    }
+                }
+            }
+            finally
+            {
+                if (srcData != null) src24.UnlockBits(srcData);
+                if (dstData != null) clone.UnlockBits(dstData);
+
+                // 3. Dispose bitmap trung gian nếu có
+                if (!ReferenceEquals(src24, src))
+                    src24.Dispose();
+            }
+
+            return clone;
         }
     }
 }
