@@ -147,9 +147,9 @@
             this.label2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(46)))), ((int)(((byte)(79)))), ((int)(((byte)(109)))));
             this.label2.Location = new System.Drawing.Point(111, 3);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(221, 54);
+            this.label2.Size = new System.Drawing.Size(354, 54);
             this.label2.TabIndex = 31;
-            this.label2.Text = "Viet ANPR";
+            this.label2.Text = "Viet ANPR Server";
             // 
             // pictureBox1
             // 
