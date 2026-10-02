@@ -152,5 +152,8 @@
   <ItemGroup>
     <None Include="Resources\Cuda_logo.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\save_32.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

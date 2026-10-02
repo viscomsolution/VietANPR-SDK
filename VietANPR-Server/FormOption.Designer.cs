@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormOption));
             this.colorGroupBox1 = new TGMTcontrols.ColorGroupBox();
             this.txt_secretKey = new TGMTcontrols.PasswordBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -157,12 +158,12 @@
             this.btn_save.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.btn_save.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
             this.btn_save.ForeColor = System.Drawing.Color.White;
-            this.btn_save.Icon = null;
+            this.btn_save.Icon = global::MiniServer.Properties.Resources.save_32;
             this.btn_save.ImageLocation = new System.Drawing.Point(0, 0);
             this.btn_save.ImageSize = new System.Drawing.Size(24, 24);
             this.btn_save.Inactive1 = System.Drawing.Color.DeepSkyBlue;
             this.btn_save.Inactive2 = System.Drawing.Color.DodgerBlue;
-            this.btn_save.Location = new System.Drawing.Point(320, 137);
+            this.btn_save.Location = new System.Drawing.Point(311, 137);
             this.btn_save.Name = "btn_save";
             this.btn_save.Radius = 6;
             this.btn_save.Size = new System.Drawing.Size(113, 42);
@@ -182,6 +183,7 @@
             this.ClientSize = new System.Drawing.Size(722, 219);
             this.Controls.Add(this.btn_save);
             this.Controls.Add(this.colorGroupBox1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "FormOption";
