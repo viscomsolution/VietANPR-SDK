@@ -28,9 +28,20 @@ namespace ExamplePOSTrequest
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            txt_serverIP.Text = TGMTini.GetInstance().ReadString("txt_serverIP");
-            txt_serverPort.Text = TGMTini.GetInstance().ReadString("txt_serverPort");
+            string serverIP = TGMTini.GetInstance().ReadString("txt_serverIP");
+            if(!string.IsNullOrWhiteSpace(serverIP))
+                txt_serverIP.Text = serverIP;
+
+            string port = TGMTini.GetInstance().ReadString("txt_serverPort");
+            if(!string.IsNullOrWhiteSpace(port))
+                txt_serverPort.Text = port;
+            
             txt_filePath.Text = TGMTini.GetInstance().ReadString("txt_filePath");
+
+            string secretKey = TGMTini.GetInstance().ReadString("txt_secretKey");
+            if(secretKey != "")
+                Program.secretKey = secretKey;
+            txt_secretKey.Text = Program.secretKey;
 
             _inited = true;
         }
@@ -57,6 +68,17 @@ namespace ExamplePOSTrequest
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+        private void txt_secretKey_TextChanged(object sender, EventArgs e)
+        {
+            if(!_inited)
+                return;
+
+            Program.secretKey = txt_secretKey.Text;
+            TGMTini.GetInstance().SaveValue("txt_secretKey", txt_secretKey.Text);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
         private void txt_filePath_TextChanged(object sender, EventArgs e)
         {            
             m_bmp = TGMTimage.LoadBitmapWithoutLock(txt_filePath.Text);
@@ -79,6 +101,8 @@ namespace ExamplePOSTrequest
             }
 
             panelResult.Controls.Clear();
+            circle1.Visible = true;
+
             SendImageToServer(m_bmp, false);
         }
 
@@ -92,7 +116,8 @@ namespace ExamplePOSTrequest
             var param = new Dictionary<string, string>() 
             { 
                 { "imageBase64", imageBase64 },
-                { "cropped", cropped ? "true" : "false" }
+                { "cropped", cropped ? "true" : "false" },
+                { "secretKey", Program.secretKey}
             };
 
 
@@ -103,6 +128,11 @@ namespace ExamplePOSTrequest
 
         void OnResponse(int code, string respond)
         {
+            TGMTthread.BeginInvokeSafe(this, () =>
+            {
+                circle1.Visible = false;
+            });
+
             if(code != 200)
             {
                 MessageBox.Show("Error: " + code + "\n" + respond);

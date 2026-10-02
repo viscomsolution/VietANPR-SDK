@@ -8,7 +8,9 @@ namespace MiniServer
 {
     static class Program
     {
-        public static string saveDir = "images\\";
+        public static string secretKey = "123456";
+        public static int port = 9999;
+
 
         /// <summary>
         /// The main entry point for the application.

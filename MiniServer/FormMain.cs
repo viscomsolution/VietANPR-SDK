@@ -58,7 +58,7 @@ namespace MiniServer
 
 
         DateTime _startupTime = DateTime.Now;
-        int _port = 9999;
+        
 
         int COL_FRAME = 1;
 
@@ -144,6 +144,18 @@ namespace MiniServer
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+        private void btn_option_Click(object sender, EventArgs e)
+        {
+            FormOption form = new FormOption();
+            if(form.ShowDialog() == DialogResult.OK)
+            {
+                StopServer();
+                StartServer();
+            }
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
         private void workerLoading_DoWork(object sender, DoWorkEventArgs e)
         {
             PlateReaderMgr.GetInstance().MaxReaders = (int)numericUpDown1.Value;
@@ -172,12 +184,12 @@ namespace MiniServer
                 TGMTserver.GetInstance().onPostRequest += OnPostRequest;
             }
             
-            TGMTserver.GetInstance().Start(_port);
+            TGMTserver.GetInstance().Start(Program.port);
 
             TGMTthread.BeginInvokeSafe(this, () => {
                 lbl_serverStatus.Text = "RUNNING";
                 btn_startServer.Text = "STOP";
-                lbl_address.Text = $"http://{TGMThardware.GetIPAddress()}:{_port}";
+                lbl_address.Text = $"http://{TGMThardware.GetIPAddress()}:{Program.port}";
             });
 
             Console.WriteLine(TGMThardware.GetMacAddress());
@@ -328,6 +340,19 @@ namespace MiniServer
             }
             else
             {
+                string secretKey = "";
+                if(param.ContainsKey("secretKey"))
+                    secretKey = param["secretKey"];
+
+                if(secretKey != Program.secretKey)
+                {
+                    obj["status"] = "ERROR";
+                    obj["message"] = "Invalid secret key.";
+                    TGMTserver.WriteText(res, obj.ToString());
+                    res.Close();
+                    return;
+                }
+
                 string imageBase64 = param["imageBase64"];
                 bool cropped = param.ContainsKey("cropped") && param["cropped"] == "true";
 

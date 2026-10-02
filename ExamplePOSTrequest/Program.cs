@@ -9,6 +9,8 @@ namespace ExamplePOSTrequest
 {
     internal static class Program
     {
+        public static string secretKey = "123456";
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>

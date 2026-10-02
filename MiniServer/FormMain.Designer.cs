@@ -67,7 +67,6 @@
             this.timerHardware = new System.Windows.Forms.Timer(this.components);
             this.timerServer = new System.Windows.Forms.Timer(this.components);
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.workerLoading = new System.ComponentModel.BackgroundWorker();
             this.Column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column3 = new System.Windows.Forms.DataGridViewImageColumn();
             this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -75,6 +74,7 @@
             this.Column6 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.workerLoading = new System.ComponentModel.BackgroundWorker();
             this.gradientPanel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.panelLeft.SuspendLayout();
@@ -185,6 +185,7 @@
             this.defaultButton8.TabIndex = 29;
             this.defaultButton8.Text = "Cài đặt";
             this.defaultButton8.Transparency = false;
+            this.defaultButton8.Click += new System.EventHandler(this.btn_option_Click);
             // 
             // panelLeft
             // 
@@ -624,11 +625,6 @@
             this.dataGridView1.TabIndex = 34;
             this.dataGridView1.CellValueNeeded += new System.Windows.Forms.DataGridViewCellValueEventHandler(this.dataGridView1_CellValueNeeded);
             // 
-            // workerLoading
-            // 
-            this.workerLoading.DoWork += new System.ComponentModel.DoWorkEventHandler(this.workerLoading_DoWork);
-            this.workerLoading.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.workerLoading_RunWorkerCompleted);
-            // 
             // Column2
             // 
             this.Column2.HeaderText = "#";
@@ -668,6 +664,11 @@
             // 
             this.Column4.HeaderText = "Method";
             this.Column4.Name = "Column4";
+            // 
+            // workerLoading
+            // 
+            this.workerLoading.DoWork += new System.ComponentModel.DoWorkEventHandler(this.workerLoading_DoWork);
+            this.workerLoading.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.workerLoading_RunWorkerCompleted);
             // 
             // FormMain
             // 

@@ -41,6 +41,8 @@
             this.panelResult = new System.Windows.Forms.FlowLayoutPanel();
             this.panelPicture = new System.Windows.Forms.Panel();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.txt_secretKey = new TGMTcontrols.PasswordBox();
             this.colorGroupBox1.SuspendLayout();
             this.colorGroupBox2.SuspendLayout();
             this.panelPicture.SuspendLayout();
@@ -79,7 +81,8 @@
             this.colorGroupBox1.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(92)))), ((int)(((byte)(133)))), ((int)(((byte)(200)))));
             this.colorGroupBox1.BorderThickness = 3;
             this.colorGroupBox1.Checked = false;
-            this.colorGroupBox1.Controls.Add(this.circle1);
+            this.colorGroupBox1.Controls.Add(this.txt_secretKey);
+            this.colorGroupBox1.Controls.Add(this.label1);
             this.colorGroupBox1.Controls.Add(this.label11);
             this.colorGroupBox1.Controls.Add(this.txt_serverIP);
             this.colorGroupBox1.Controls.Add(this.label10);
@@ -103,7 +106,7 @@
             this.circle1.BackColor = System.Drawing.Color.Transparent;
             this.circle1.IndexColor = System.Drawing.Color.DeepSkyBlue;
             this.circle1.Interval = 50;
-            this.circle1.Location = new System.Drawing.Point(391, 32);
+            this.circle1.Location = new System.Drawing.Point(742, 30);
             this.circle1.Name = "circle1";
             this.circle1.NCircle = 8;
             this.circle1.Others = System.Drawing.Color.LightGray;
@@ -179,6 +182,7 @@
             this.colorGroupBox2.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(92)))), ((int)(((byte)(133)))), ((int)(((byte)(200)))));
             this.colorGroupBox2.BorderThickness = 3;
             this.colorGroupBox2.Checked = false;
+            this.colorGroupBox2.Controls.Add(this.circle1);
             this.colorGroupBox2.Controls.Add(this.btn_send);
             this.colorGroupBox2.Controls.Add(this.txt_filePath);
             this.colorGroupBox2.Controls.Add(this.label2);
@@ -248,6 +252,32 @@
             this.pictureBox1.TabIndex = 28;
             this.pictureBox1.TabStop = false;
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Arial", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(402, 45);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(74, 16);
+            this.label1.TabIndex = 123;
+            this.label1.Text = "Secret key";
+            // 
+            // txt_secretKey
+            // 
+            this.txt_secretKey.BackColor = System.Drawing.Color.Transparent;
+            this.txt_secretKey.BackgroundColor = System.Drawing.Color.White;
+            this.txt_secretKey.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(92)))), ((int)(((byte)(133)))), ((int)(((byte)(200)))));
+            this.txt_secretKey.Font = new System.Drawing.Font("Segoe UI", 11F);
+            this.txt_secretKey.ForeColor = System.Drawing.SystemColors.WindowText;
+            this.txt_secretKey.Location = new System.Drawing.Point(484, 35);
+            this.txt_secretKey.Name = "txt_secretKey";
+            this.txt_secretKey.Padding = new System.Windows.Forms.Padding(5);
+            this.txt_secretKey.Radius = 6;
+            this.txt_secretKey.Size = new System.Drawing.Size(206, 33);
+            this.txt_secretKey.TabIndex = 124;
+            this.txt_secretKey.TabStop = false;
+            this.txt_secretKey.TextChanged += new System.EventHandler(this.txt_secretKey_TextChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -286,6 +316,8 @@
         private System.Windows.Forms.Panel panelPicture;
         private System.Windows.Forms.PictureBox pictureBox1;
         private TGMTcontrols.DefaultButton btn_send;
+        private System.Windows.Forms.Label label1;
+        private TGMTcontrols.PasswordBox txt_secretKey;
     }
 }
 
