@@ -401,9 +401,11 @@ namespace MiniServer
                 obj["objects"] = objects.ToString(Newtonsoft.Json.Formatting.None);
                 obj["status"] = "OK";
 
+                string clientIP = TGMTserver.GetClientIp(req);
+
                 Task.Run(() =>
                 {
-                    DisplayToGrid(bmp, plates, sw.ElapsedMilliseconds);
+                    DisplayToGrid(bmp, plates, sw.ElapsedMilliseconds, clientIP);
                 });
             }
 
@@ -417,7 +419,7 @@ namespace MiniServer
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        void DisplayToGrid(Bitmap bmp, VehiclePlate[] plates, long elapsed)
+        void DisplayToGrid(Bitmap bmp, VehiclePlate[] plates, long elapsed, string clientIP)
         {
             if(plates == null || plates.Length == 0)
                 return;
@@ -442,7 +444,7 @@ namespace MiniServer
                         plate.text,
                         DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                         elapsed,
-                        "192.168.1.27",
+                        clientIP,
                         "POST"
                     },
                 });

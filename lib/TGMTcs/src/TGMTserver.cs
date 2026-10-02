@@ -216,5 +216,32 @@ namespace TGMTcs
 
             return postParams;
         }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static string GetClientIp(HttpListenerRequest req)
+        {
+            string xForwardedFor = req.Headers["X-Forwarded-For"];
+            if(!string.IsNullOrWhiteSpace(xForwardedFor))
+            {
+                string forwardedIp = xForwardedFor.Split(',')[0].Trim();
+                if(!string.IsNullOrWhiteSpace(forwardedIp))
+                    return forwardedIp;
+            }
+
+            string xRealIp = req.Headers["X-Real-IP"];
+            if(!string.IsNullOrWhiteSpace(xRealIp))
+                return xRealIp.Trim();
+
+            string ip = req.RemoteEndPoint?.Address?.ToString() ?? "";
+
+            if(ip == "::1")
+                return "127.0.0.1";
+
+            if(ip.StartsWith("::ffff:"))
+                return ip.Substring(7);
+
+            return ip;
+        }
     }
 }
