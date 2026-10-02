@@ -219,32 +219,39 @@ namespace MiniServer
 
         private void timerHardware_Tick(object sender, EventArgs e)
         {
-            lbl_CPU.Text = _cpuCounter.NextValue().ToString("F1") + "%";
-
-            double usedMB, totalMB, percent;
-            TGMThardware.GetMemory(out usedMB, out totalMB, out percent);
-
-            lbl_RAM.Text = $"{usedMB:N0}/ {totalMB:N0} MB ({percent:N0}%)";
-
-            string nvmlPath = @"C:\Windows\System32\nvml.dll";
-            if(File.Exists(nvmlPath))
+            try
             {
+                lbl_CPU.Text = _cpuCounter.NextValue().ToString("F1") + "%";
 
-                IntPtr GPUpointer;
-                nvmlDeviceGetHandleByIndex_v2(0, out GPUpointer);
+                double usedMB, totalMB, percent;
+                TGMThardware.GetMemory(out usedMB, out totalMB, out percent);
 
-                nvmlUtilization_t util;
-                nvmlDeviceGetUtilizationRates(GPUpointer, out util);
+                lbl_RAM.Text = $"{usedMB:N0}/ {totalMB:N0} MB ({percent:N0}%)";
 
-                lbl_CUDA.Text = util.gpu + "%";
+                string nvmlPath = @"C:\Windows\System32\nvml.dll";
+                if(File.Exists(nvmlPath))
+                {
+
+                    IntPtr GPUpointer;
+                    nvmlDeviceGetHandleByIndex_v2(0, out GPUpointer);
+
+                    nvmlUtilization_t util;
+                    nvmlDeviceGetUtilizationRates(GPUpointer, out util);
+
+                    lbl_CUDA.Text = util.gpu + "%";
 
 
-                nvmlMemory_t mem;
-                nvmlDeviceGetMemoryInfo(GPUpointer, out mem);
+                    nvmlMemory_t mem;
+                    nvmlDeviceGetMemoryInfo(GPUpointer, out mem);
 
-                double VRAMusage = mem.used / 1024 / 1024;
-                double VRAMtotal = mem.total / 1024 / 1024;
-                lbl_VRAM.Text = $"{VRAMusage:N0}/{VRAMtotal:N0} MB ({util.memory}%)";
+                    double VRAMusage = mem.used / 1024 / 1024;
+                    double VRAMtotal = mem.total / 1024 / 1024;
+                    lbl_VRAM.Text = $"{VRAMusage:N0}/{VRAMtotal:N0} MB ({util.memory}%)";
+                }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
             }
         }
 
