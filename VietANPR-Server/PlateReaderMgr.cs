@@ -20,19 +20,12 @@ namespace MiniServer
         public static object _locker = new object();
         private static PlateReaderMgr m_instance = null;
 
-        int _max_readers = 1;
-
-
+        int _max_reader = 1;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         public PlateReaderMgr()
         {
-            for(int i = 0; i < _max_readers; i++)
-            {
-                //_readers.Add(null);
-                _frees.Add(new AtomicBool(true));
-            }
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -51,55 +44,20 @@ namespace MiniServer
             for(int j = 0; j < _frees.Count; j++)
             {
                 _frees[j].Set(true);
-            }            
+            }
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public VehiclePlate Read(Bitmap bmp, bool cropped)
+        public VehiclePlate[] Reads(string filePath)
         {
-            if(bmp == null)
+            if(!System.IO.File.Exists(filePath))
             {
                 return null;
             }
-
-            int detectorIdx = -1;
-
-
-            while(detectorIdx < 0)
-            {
-                lock(_locker)
-                {                
-                    for(int i = 0; i < _frees.Count; i++)
-                    {
-                        if(_frees[i].Get())
-                        {
-                            _frees[i].Set(false);
-
-                            detectorIdx = i;
-                            if(detectorIdx >= _readers.Count)
-                            {
-                                PlateReader reader = new PlateReader();
-                                reader.DrawRectangle = false;
-                                _readers.Add(reader);
-                            }
-
-                            break;
-                        }
-                    }
-                }
-
-                Thread.Sleep(10);                
-            }
-            VehiclePlate result = _readers[detectorIdx].Read(bmp, cropped);
-
-            Task.Run(() =>
-            {
-                lock (_locker)
-                    _frees[detectorIdx].Set(true);
-            });
-
-
+            Bitmap bmp = new Bitmap(filePath);
+            VehiclePlate[] result = Reads(bmp, false);
+            bmp.Dispose();
             return result;
         }
 
@@ -113,98 +71,89 @@ namespace MiniServer
             }
 
             int detectorIdx = -1;
+            PlateReader detector = null;
 
-
-            while(detectorIdx < 0)
+            while(detector == null)
             {
                 lock(_locker)
                 {
                     for(int i = 0; i < _frees.Count; i++)
                     {
-                        if(_frees[i].Get())
+                        if(!_frees[i].Get())
+                            continue;
+
+                        _frees[i].Set(false);
+                        detectorIdx = i;
+
+                        while(_readers.Count <= detectorIdx)
                         {
-                            _frees[i].Set(false);
-
-                            detectorIdx = i;
-                            if(detectorIdx >= _readers.Count)
-                            {
-                                PlateReader reader = new PlateReader();
-                                reader.CropPlate = true;
-                                reader.DrawRectangle = false;
-                                _readers.Add(reader);
-                            }
-
-                            break;
+                            PlateReader reader = new PlateReader();
+                            reader.CropPlate = true;
+                            reader.DrawRectangle = false;
+                            _readers.Add(reader);
                         }
+
+
+                        detector = _readers[detectorIdx];
+                        break;
                     }
                 }
-            }
-            VehiclePlate[] result = _readers[detectorIdx].Reads(bmp, cropped);
 
-            Task.Run(() =>
+                if(detector == null)
+                    Thread.Sleep(1);
+            }
+
+            try
+            {
+                return detector.Reads(bmp, cropped);
+            }
+            finally
             {
                 lock(_locker)
-                    _frees[detectorIdx].Set(true);
-            });
-
-
-            return result;
-        }
-
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public bool IsReaderFree(int index)
-        {
-            if (index < 0)
-                return false;
-
-
-            // Ensure _readers and _frees have enough elements
-            while (_readers.Count <= index)
-            {
-                _readers.Add(null);
-            }
-            while (_frees.Count <= index)
-            {
-                _frees.Add(new AtomicBool(true));
-            }
-
-            if (_readers[index] == null)
-            {
-                PlateReader reader = new PlateReader();
-                reader.DrawRectangle = false;
-
-                _readers[index] = reader;
-                _frees[index].Set(false);
-                return true;
-            }
-
-            if (_frees[index].Get())
-            {
-                _frees[index].Set(false);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-            
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public int MaxReaders
-        {
-            get { return _max_readers; }
-            set 
-            { 
-                _max_readers = value;
-                if(_max_readers > _readers.Count)
                 {
-                    for(int i = _readers.Count; i < _max_readers; i++)
+                    if(detectorIdx >= 0 && detectorIdx < _frees.Count)
+                        _frees[detectorIdx].Set(true);
+                }
+            }
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public int MaxReader
+        {
+            get { return _max_reader; }
+            set
+            {
+                if(value < 1)
+                    value = 1;
+
+                lock(_locker)
+                {
+                    _max_reader = value;
+
+                    while(_readers.Count < _max_reader)
                     {
-                        _readers.Add(new PlateReader());
+                        PlateReader reader = new PlateReader();
+                        reader.CropPlate = true;
+                        reader.DrawRectangle = false;
+                        _readers.Add(reader);
+                    }
+
+                    while(_frees.Count < _max_reader)
+                    {
+                        _frees.Add(new AtomicBool(true));
+                    }
+
+                    while(_readers.Count > _max_reader && _frees.Count > _max_reader)
+                    {
+                        int last = _readers.Count - 1;
+
+                        // Do not remove a reader that is currently in use.
+                        if(last < 0 || !_frees[last].Get())
+                            break;
+
+                        _readers.RemoveAt(last);
+                        _frees.RemoveAt(last);
                     }
                 }
             }

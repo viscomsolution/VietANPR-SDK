@@ -158,7 +158,7 @@ namespace MiniServer
 
         private void workerLoading_DoWork(object sender, DoWorkEventArgs e)
         {
-            PlateReaderMgr.GetInstance().MaxReaders = (int)numericUpDown1.Value;
+            PlateReaderMgr.GetInstance().MaxReader = (int)numericUpDown1.Value;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -172,7 +172,7 @@ namespace MiniServer
 
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
         {
-            PlateReaderMgr.GetInstance().MaxReaders = (int)numericUpDown1.Value;
+            PlateReaderMgr.GetInstance().MaxReader = (int)numericUpDown1.Value;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
